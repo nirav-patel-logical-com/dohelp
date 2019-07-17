@@ -167,7 +167,7 @@
                         var obj = jQuery.parseJSON(response)
                         if (obj.STATUS_CODE == 200) {
                             swal("Success", obj.MESSAGE, "success");
-                            window.location = '';
+                            window.location = '<?php echo route('dashboard');?>';
 
                         } else {
                             swal("Success", obj.MESSAGE, "success");
