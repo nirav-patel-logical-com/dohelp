@@ -13,8 +13,6 @@
 @endsection
 
 @section('header-pages-include')
-<!--Morris Chart CSS -->
-<link rel="stylesheet" href="{{ env('APP_URL') }}public/plugins/morris/morris.css">
 <!-- Plugins css -->
 <link href="{{ env('APP_URL') }}public/plugins/timepicker/bootstrap-timepicker.min.css" rel="stylesheet">
 <link href="{{ env('APP_URL') }}public/plugins/mjolnic-bootstrap-colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet">
@@ -36,11 +34,16 @@
     <!-- Start content -->
     <div class="content">
         <div class="container-fluid">
-            <div class="row justify-content-end">
-                <div class="col-auto">
-                    <div class="form-group ">
-                        <label>Select Date Range</label>
-
+            <div class="row ">
+                <div class="col-12 mb-2">
+                    <div class="form-group row justify-content-end">
+                        <label class="col-md-2 col-form-label text-right">Select Date Range</label>
+                        <div class="col-auto">
+                            <div id="reportrange" class="float-right form-control">
+                                <i class="fa fa-calendar"></i>
+                                <span></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -92,7 +95,7 @@
                     <div class="card-box tilebox-one border-success border">
                         <i class="fa fa-info-circle float-right text-muted"></i>
                         <h6 class="text-muted text-uppercase m-b-20">Get Help</h6>
-                        <h2 class="m-b-20"><span data-plugin="counterup">1,587</span><small class="text-muted text-sub">/Users</small></h2>
+                        <h2 class="m-b-20"><i class="fa fa-rupee"></i> <span data-plugin="counterup">1,587</span></h2>
                     </div>
                 </div>
 
@@ -100,7 +103,7 @@
                     <div class="card-box tilebox-one border-danger border">
                         <i class="fa fa-info float-right text-muted"></i>
                         <h6 class="text-muted text-uppercase m-b-20">Pending Get Help</h6>
-                        <h2 class="m-b-20"><span data-plugin="counterup">46782</span><small class="text-muted text-sub">/Users</small></h2>
+                        <h2 class="m-b-20"><i class="fa fa-rupee"></i> <span data-plugin="counterup">46782</span></h2>
                     </div>
                 </div>
 
@@ -108,7 +111,7 @@
                     <div class="card-box tilebox-one border-success border">
                         <i class="ti-info-alt float-right text-muted"></i>
                         <h6 class="text-muted text-uppercase m-b-20">Paid Help</h6>
-                        <h2 class="m-b-20"><span data-plugin="counterup">500</span><small class="text-muted text-sub">/Users</small></h2>
+                        <h2 class="m-b-20"><i class="fa fa-rupee"></i><span data-plugin="counterup">500</span></h2>
                     </div>
                 </div>
 
@@ -116,7 +119,7 @@
                     <div class="card-box tilebox-one border-danger border">
                         <i class="ti-info float-right text-muted"></i>
                         <h6 class="text-muted text-uppercase m-b-20">Pending Paid Help</h6>
-                        <h2 class="m-b-20"><span data-plugin="counterup">1,890</span><small class="text-muted text-sub">/Users</small></h2>
+                        <h2 class="m-b-20"><i class="fa fa-rupee"></i> <span data-plugin="counterup">1,890</span></h2>
                     </div>
                 </div>
             </div>
@@ -209,9 +212,6 @@
 
 
 @section('footer-pages-include')
-<!--Morris Chart-->
-<script src="{{ env('APP_URL') }}public/plugins/morris/morris.min.js"></script>
-<script src="{{ env('APP_URL') }}public/plugins/raphael/raphael.min.js"></script>
 
 <!-- Page specific js -->
 <script src="{{ env('APP_URL') }}public/assets/pages/jquery.dashboard.js"></script>
@@ -225,7 +225,7 @@
 <script src="{{ env('APP_URL') }}public/plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
 
 <!--Date Range Picker End-->
-
+<script src="{{ env('APP_URL') }}public/assets/pages/jquery.form-pickers.init.js"></script>
 
 @endsection
 
