@@ -5,8 +5,13 @@
  * Date: 7/17/2019
  * Time: 10:31 AM
  */ ?>
+@extends('includes.base_account')
 
-@include('includes.header_account')
+@section('seo-tag')
+    <title>Man Help</title>
+@endsection
+
+@section('content')
 <div class="account-pages"></div>
 <div class="clearfix"></div>
 <div class="wrapper-page">
@@ -77,8 +82,9 @@
     </div>
 </div>
 <!-- end wrapper page -->
+@endsection
 
-@include('includes.footer_account')
+@section('footer-pages-include')
 <script>
     $(document).ready(function(){
         $("#submitBtnLogin").click(function(){
@@ -126,3 +132,4 @@
         });
     });
 </script>
+@endsection

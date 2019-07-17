@@ -4,17 +4,20 @@
  * User: vidhi_BSP
  * Date: 7/16/2019
  * Time: 5:09 PM
- */?>
-<?php
-$site_path = env('APP_URL');
-$site_path = $site_path.'public/';
+ */
 ?>
-@include('includes.header_start')
+@extends('includes.base')
+
+@section('seo-tag')
+    <title>Man Help Desh board</title>
+@endsection
+
+@section('header-pages-include')
 <!--Morris Chart CSS -->
-<link rel="stylesheet" href="{{$site_path}}plugins/morris/morris.css">
+<link rel="stylesheet" href="{{ env('APP_URL') }}public/plugins/morris/morris.css">
+@endsection
 
-@include('includes.header_end')
-
+@section('content')
 <!-- ============================================================== -->
 <!-- Start right Content here -->
 <!-- ============================================================== -->
@@ -323,17 +326,15 @@ $site_path = $site_path.'public/';
 </div>
 <!-- End content-page -->
 
-
-<!-- ============================================================== -->
-<!-- End Right content here -->
-<!-- ============================================================== -->
+@endsection
 
 
-@include('includes.footer_start')
+@section('footer-pages-include')
 <!--Morris Chart-->
-<script src="{{$site_path}}plugins/morris/morris.min.js"></script>
-<script src="{{$site_path}}plugins/raphael/raphael.min.js"></script>
+<script src="{{ env('APP_URL') }}public/plugins/morris/morris.min.js"></script>
+<script src="{{ env('APP_URL') }}public/plugins/raphael/raphael.min.js"></script>
 
 <!-- Page specific js -->
-<script src="{{$site_path}}assets/pages/jquery.dashboard.js"></script>
-@include('includes.footer_end')
+<script src="{{ env('APP_URL') }}public/assets/pages/jquery.dashboard.js"></script>
+@endsection
+
