@@ -65,6 +65,17 @@ class User extends Authenticatable implements JWTSubject
 
         return $collection->toArray();
     }
+    public function check_admin_login($mobile,$mobile_country_code)
+    {
+        $collection = DB::table($this->table)
+            ->Where('user_status', 'Active')
+            ->Where('user_mobile', $mobile)
+            ->Where('user_mobile_country_code', $mobile_country_code)
+            ->Where('user_role_name','=','Admin')
+            ->get();
+
+        return $collection->toArray();
+    }
     public function get_user_list($start, $limit)
     {
         return DB::table($this->table)

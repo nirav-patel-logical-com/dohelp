@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller{
@@ -26,18 +27,14 @@ class LoginController extends Controller{
             $User = new User();
             $mobile = $_POST['user_mobile'];
             $mobile_country_code = $_POST['user_mobile_country_code'];
-            $login_data = $User->check_user_login($mobile, $mobile_country_code);
+            $login_data = $User->check_admin_login($mobile, $mobile_country_code);
             //dd($login_data);
             if (isset($login_data) && !empty($login_data)) {
                 if (Hash::check($_POST['password'], $login_data[0]->password)) {
                     // get mobile and password from request
                     $credentials = request(['user_mobile', 'password']);
                     unset($login_data[0]->password);
-                    // try to auth and get the token using api authentication
-                    if (!$token = auth('api')->attempt($credentials)) {
-                        // if the credentials are wrong we send an unauthorized error in json format
-                        return response()->json(['error' => 'Unauthorized'], 401);
-                    }
+
                     $this->set_session_during_back_end_login($login_data);
                     $BSPController->send_response_api(200, 'Login Success', $login_data[0]);
                 }
@@ -53,12 +50,17 @@ class LoginController extends Controller{
     public function logout()
     {
         Session::flush();
-        return redirect()->route('business_details');
+        return redirect()->route('login');
     }
     public function login()
     {
-        return response()
-            ->view('auth.login');
+        if (Session::has('login_data')) {
+            return redirect()->route('dashboard');
+        }else{
+            return response()
+                ->view('auth.login');
+        }
+
     }
 
 }
