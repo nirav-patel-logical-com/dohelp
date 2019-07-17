@@ -1,14 +1,15 @@
-<?php
-$site_path = env('APP_URL');
-$site_path = $site_path.'public/';
-?>        <!-- Bootstrap CSS -->
-        <link href="{{$site_path}}assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+       <!-- Bootstrap CSS -->
+        <link href="{{env('APP_URL')}}public/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         
         <!-- App CSS -->
-        <link href="{{$site_path}}assets/css/style.css" rel="stylesheet" type="text/css" />
+        <link href="{{env('APP_URL')}}public/assets/css/style.css" rel="stylesheet" type="text/css" />
 
         <!-- Modernizr js -->
-        <script src="{{$site_path}}assets/js/modernizr.min.js"></script>
+        <script src="{{env('APP_URL')}}public/assets/js/modernizr.min.js"></script>
+
+        <!-- Page Include Start -->
+        @yield('header-pages-include')
+        <!-- Page Include End -->
 
     </head>
 

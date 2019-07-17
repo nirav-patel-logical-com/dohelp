@@ -50,5 +50,15 @@ class LoginController extends Controller{
         }
 
     }
+    public function logout()
+    {
+        Session::flush();
+        return redirect()->route('business_details');
+    }
+    public function login()
+    {
+        return response()
+            ->view('auth.login');
+    }
 
 }
