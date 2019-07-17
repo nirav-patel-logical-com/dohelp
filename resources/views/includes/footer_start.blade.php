@@ -145,7 +145,7 @@
 
         <!-- KNOB JS -->
         <!--[if IE]>
-        <script type="text/javascript" src="assets/plugins/jquery-knob/excanvas.js"></script>
+        <script type="text/javascript" src="{{env('APP_URL')}}public/assets/plugins/jquery-knob/excanvas.js"></script>
         <![endif]-->
         <script src="{{env('APP_URL')}}public/plugins/jquery-knob/jquery.knob.js"></script>
 

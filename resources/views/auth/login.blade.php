@@ -25,7 +25,7 @@
         <div class="card-box mb-0">
             <div class="text-center m-t-20">
                 <a href="#" class="logo">
-                    <img src="public/assets/images/logo/man-help_01Logo.jpg" height="60px">
+                    <img src="{{env('APP_URL')}}public/assets/images/logo/man-help_01Logo.jpg" height="60px">
                 </a>
             </div>
             <div class="m-t-10 p-20">
