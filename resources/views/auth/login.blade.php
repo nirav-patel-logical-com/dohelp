@@ -24,19 +24,33 @@
                         <h6 class="text-muted text-uppercase m-b-0 m-t-0">Sign In</h6>
                     </div>
                 </div>
-                <form class="m-t-20" id="myLoginForm" method="post" action="{{route('loginAction')}}">
-
+                <form class="m-t-20" id="myLoginForm">
+                    @csrf
                     <div class="form-group row"  id="div_user_phone">
                         <div class="col-12">
-                            <input class="form-control{{$errors->has('mobile') ? 'is-invalid' : ''}}" type="text" id="user_mobile" placeholder="Mobile" onkeyup="BSP.only('digit','mobile')">
+                            <input class="form-control" type="text" id="user_mobile" placeholder="Mobile" onkeyup="BSP.only('digit','user_mobile')">
                             <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_phone"></li></ul>
+                            @if ($errors->has('mobile'))
+                                <ul class="parsley-errors-list filled">
+                                    <li class="parsley-required" id="label_user_phone">
+                                        {{$errors->first('mobile')}}
+                                    </li>
+                                </ul>
+                            @endif
                         </div>
                     </div>
 
                     <div class="form-group row" id="div_user_password">
                         <div class="col-12">
-                            <input class="form-control" type="password" id="password" placeholder="Password">
+                            <input class="form-control" type="password" id="password" placeholder="Password" name="password">
                             <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_password"></li></ul>
+                            @if ($errors->has('password'))
+                                <ul class="parsley-errors-list filled">
+                                    <li class="parsley-required" id="label_user_password">
+                                        {{$errors->first('password')}}
+                                    </li>
+                                </ul>
+                            @endif
                         </div>
                     </div>
                     <div class="form-group row">
@@ -101,7 +115,7 @@
                 $("#label_user_phone").html("Mobile number length should be enter 4 to 12 digits.");
                 flag++;
                 if (scroll_element == '') {
-                    scroll_element = 'password';
+                    scroll_element = 'user_mobile';
                 }
             }else{
                 $("#user_mobile").removeClass('parsley-error');
@@ -113,7 +127,7 @@
                 $("#label_user_password").html("Please Enter Password.");
                 flag++;
                 if (scroll_element == '') {
-                    scroll_element = 'div_user_password';
+                    scroll_element = 'password';
                 }
             }
             else {
@@ -121,7 +135,27 @@
                 $("#label_user_password").html("");
             }
             if(flag==0){
-                $("#myLoginForm").submit(); // Submit the form
+                $.ajax({
+                    url: '<?php echo route('loginAction'); ?>',
+                    type: 'POST',
+                    data: {
+                        'user_mobile': mobile,
+                        'password': password,
+                        'user_mobile_country_code': '+91',
+                        '_token': '<?php echo csrf_token();?>'
+                    },
+                    success: function (response) {
+
+                        var obj = jQuery.parseJSON(response)
+                        if (obj.STATUS_CODE == 200) {
+                            swal("Success", obj.MESSAGE, "success");
+                            window.location = '<?php echo route('business_details');?>';
+
+                        } else {
+                            swal("Success", obj.MESSAGE, "success");
+                        }
+                    }
+                });
             }
         });
     });

@@ -17,4 +17,5 @@
 Route::get('/', 'LoginController@login')->name('login');
 Route::get('/recovery-password', 'UsersController@recoveryPassword')->name('recovery-password');
 Route::get('/register', 'UsersController@register')->name('register');
+Route::get('/dashboard', 'UsersController@dashboard')->name('dashboard');
 Route::post('login-action', 'LoginController@loginAction')->name('loginAction');
