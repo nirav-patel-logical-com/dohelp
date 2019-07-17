@@ -3,7 +3,7 @@
         
         <!-- App CSS -->
         <link href="{{env('APP_URL')}}public/assets/css/style.css" rel="stylesheet" type="text/css" />
-
+        <link href="{{env('APP_URL')}}public/assets/css/custom.css" rel="stylesheet" type="text/css"/>
         <!-- Modernizr js -->
         <script src="{{env('APP_URL')}}public/assets/js/modernizr.min.js"></script>
 
