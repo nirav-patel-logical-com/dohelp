@@ -14,9 +14,9 @@
         <script src="{{$site_path}}assets/js/waves.js"></script>
         <script src="{{$site_path}}assets/js/jquery.nicescroll.js"></script>
         <script src="{{$site_path}}assets/js/jquery.scrollTo.min.js"></script>
-        <script src="assets/js/jquery.slimscroll.js"></script>
+        <script src="{{$site_path}}assets/js/jquery.slimscroll.js"></script>
         <script src="{{$site_path}}plugins/switchery/switchery.min.js"></script>
-
+        <script src="{{$site_path}}assets/js/bsp_script.js" type="text/javascript"></script>
         <!-- KNOB JS -->
         <!--[if IE]>
         <script type="text/javascript" src="{{$site_path}}assets/plugins/jquery-knob/excanvas.js"></script>

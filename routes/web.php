@@ -11,6 +11,8 @@
 |
 */
 
-Route::get('/', function () {
-    return view('dashboard.dashboard');
-});
+//Route::get('/', function () {
+//    return view('auth.login');
+//});
+Route::get('/', 'LoginController@login')->name('login');
+Route::post('login-action', 'LoginController@loginAction')->name('loginAction');
