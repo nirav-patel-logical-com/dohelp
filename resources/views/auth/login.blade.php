@@ -11,6 +11,11 @@
     <title>Man Help</title>
 @endsection
 
+@section('header-pages-include')
+    <!-- Sweet Alert css -->
+    <link href="{{env('APP_URL')}}public/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css"/>
+    @endsection
+
 @section('content')
 <div class="account-pages"></div>
 <div class="clearfix"></div>
@@ -97,6 +102,13 @@
 </div>
 <!-- end wrapper page -->
 @endsection
+
+@section('footer-pages-include')
+    <!-- Sweet Alert js -->
+    <script src="{{env('APP_URL')}}public/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="{{env('APP_URL')}}public/assets/pages/jquery.sweet-alert.init.js"></script>
+@endsection
+
 
 @section('footer-pages-include')
 <script>
