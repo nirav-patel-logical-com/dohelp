@@ -35,4 +35,16 @@ class BSPController extends Controller
         echo $response_json;
     }
 
+    public function send_sms($mobile,$msg){
+        $message = urlencode($msg);
+        $contact_no =$mobile;
+        $url="http://zensmsinstantmarketers.zenenterprises.in/api/v4/?api_key=A7ace0afac8b60d47e1381933a39c2cad&method=sms&message=$message&to=$contact_no&sender=REGMIN";
+        $ch = curl_init();
+        curl_setopt ($ch, CURLOPT_URL, $url);
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+        $html = curl_exec($ch);
+        curl_close($ch);
+
+}
+
 }

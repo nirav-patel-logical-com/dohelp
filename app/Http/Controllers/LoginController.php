@@ -15,6 +15,17 @@ use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller{
 
+    public function login()
+    {
+        if (Session::has('login_data')) {
+            return redirect()->route('dashboard');
+        }else{
+            return response()
+                ->view('auth.login');
+        }
+
+    }
+
     private function set_session_during_back_end_login($login_data)
     {
         Session::push('login_data', $login_data[0]);
@@ -32,9 +43,14 @@ class LoginController extends Controller{
             if (isset($login_data) && !empty($login_data)) {
                 if (Hash::check($_POST['password'], $login_data[0]->password)) {
                     // get mobile and password from request
-                    $credentials = request(['user_mobile', 'password']);
                     unset($login_data[0]->password);
-
+                    if($_POST["remember_me"]=='1' || $_POST["remember_me"]=='on')
+                    {
+                        $hour = time() + 3600 * 24 * 30;
+                        setcookie('user_mobile', $_POST['user_mobile'], $hour);
+                        setcookie('password', $_POST['password'], $hour);
+                        setcookie('user_mobile_country_code', $_POST['user_mobile_country_code'], $hour);
+                    }
                     $this->set_session_during_back_end_login($login_data);
                     $BSPController->send_response_api(200, 'Login Success', $login_data[0]);
                 }
@@ -51,16 +67,6 @@ class LoginController extends Controller{
     {
         Session::flush();
         return redirect()->route('login');
-    }
-    public function login()
-    {
-        if (Session::has('login_data')) {
-            return redirect()->route('dashboard');
-        }else{
-            return response()
-                ->view('auth.login');
-        }
-
     }
 
 }

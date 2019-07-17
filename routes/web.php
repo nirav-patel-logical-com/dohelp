@@ -15,7 +15,10 @@ Route::get('/des', function () {
     return view('dashboard.dashboard');
 });
 Route::get('/', 'LoginController@login')->name('login');
+Route::get('/logout', 'LoginController@logout')->name('logout');
 Route::get('/recovery-password', 'UsersController@recoveryPassword')->name('recovery-password');
-Route::get('/register', 'UsersController@register')->name('register');
-Route::get('/dashboard', 'UsersController@dashboard')->name('dashboard');
+Route::get('/register/{ref_id}', 'UsersController@register')->name('register');
+Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
 Route::post('login-action', 'LoginController@loginAction')->name('loginAction');
+Route::post('register-action', 'UsersController@registerAction')->name('registerAction');
+Route::post('recovery-password-action', 'UsersController@recoveryPasswordAction')->name('recoveryPasswordAction');

@@ -40,13 +40,6 @@
                         <div class="col-12">
                             <input class="form-control" type="text" id="user_mobile" placeholder="Mobile" onkeyup="BSP.only('digit','user_mobile')">
                             <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_phone"></li></ul>
-                            @if ($errors->has('mobile'))
-                                <ul class="parsley-errors-list filled">
-                                    <li class="parsley-required" id="label_user_phone">
-                                        {{$errors->first('mobile')}}
-                                    </li>
-                                </ul>
-                            @endif
                         </div>
                     </div>
 
@@ -54,13 +47,6 @@
                         <div class="col-12">
                             <input class="form-control" type="password" id="password" placeholder="Password" name="password">
                             <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_password"></li></ul>
-                            @if ($errors->has('password'))
-                                <ul class="parsley-errors-list filled">
-                                    <li class="parsley-required" id="label_user_password">
-                                        {{$errors->first('password')}}
-                                    </li>
-                                </ul>
-                            @endif
                         </div>
                     </div>
                     <div class="form-group row">
@@ -106,76 +92,84 @@
 @section('footer-pages-include')
     <!-- Sweet Alert js -->
     <script src="{{env('APP_URL')}}public/plugins/sweetalert2/sweetalert2.all.min.js"></script>
-    <script src="{{env('APP_URL')}}public/assets/pages/jquery.sweet-alert.init.js"></script>
-@endsection
-
-
-@section('footer-pages-include')
-<script>
-    $(document).ready(function(){
-        $("#submitBtnLogin").click(function(){
-            var mobile_no_regx = BSP.regx('mobile');
-            var user_mobile = $("#user_mobile").val();
-            var password = $("#password").val();
-            var scroll_element = '';
-            var flag = 0;
-            if (user_mobile == '') {
-                $("#user_mobile").addClass('parsley-error');
-                $("#label_user_phone").html("Please Enter Mobile Number.");
-                flag++;
-                if (scroll_element == '') {
-                    scroll_element = 'user_mobile';
-                }
-            }
-            else if(!mobile_no_regx.test(user_mobile))
-            {
-                $("#user_mobile").addClass('parsley-error');
-                $("#label_user_phone").html("Mobile number length should be enter 4 to 12 digits.");
-                flag++;
-                if (scroll_element == '') {
-                    scroll_element = 'user_mobile';
-                }
-            }else{
-                $("#user_mobile").removeClass('parsley-error');
-                $("#label_user_phone").html("");
-            }
-
-            if (password == '') {
-                $("#password").addClass('parsley-error');
-                $("#label_user_password").html("Please Enter Password.");
-                flag++;
-                if (scroll_element == '') {
-                    scroll_element = 'password';
-                }
-            }
-            else {
-                $("#password").removeClass('parsley-error');
-                $("#label_user_password").html("");
-            }
-            if(flag==0){
-                $.ajax({
-                    url: '<?php echo route('loginAction'); ?>',
-                    type: 'POST',
-                    data: {
-                        'user_mobile': mobile,
-                        'password': password,
-                        'user_mobile_country_code': '+91',
-                        '_token': '<?php echo csrf_token();?>'
-                    },
-                    success: function (response) {
-
-                        var obj = jQuery.parseJSON(response)
-                        if (obj.STATUS_CODE == 200) {
-                            swal("Success", obj.MESSAGE, "success");
-                            window.location = '<?php echo route('dashboard');?>';
-
-                        } else {
-                            swal("Success", obj.MESSAGE, "success");
-                        }
+    {{--<script src="{{env('APP_URL')}}public/assets/pages/jquery.sweet-alert.init.js"></script>--}}
+    <script>
+        $(document).ready(function(){
+            $("#submitBtnLogin").click(function(){
+                var mobile_no_regx = BSP.regx('mobile');
+                var user_mobile = $("#user_mobile").val();
+                var password = $("#password").val();
+                var remember_me = $("#checkbox-signup").val();
+                var scroll_element = '';
+                var flag = 0;
+                if (user_mobile == '') {
+                    $("#user_mobile").addClass('parsley-error');
+                    $("#label_user_phone").html("Please Enter Mobile Number.");
+                    flag++;
+                    if (scroll_element == '') {
+                        scroll_element = 'user_mobile';
                     }
-                });
-            }
+                }
+                else if(!mobile_no_regx.test(user_mobile))
+                {
+                    $("#user_mobile").addClass('parsley-error');
+                    $("#label_user_phone").html("Mobile number length should be enter 4 to 12 digits.");
+                    flag++;
+                    if (scroll_element == '') {
+                        scroll_element = 'user_mobile';
+                    }
+                }else{
+                    $("#user_mobile").removeClass('parsley-error');
+                    $("#label_user_phone").html("");
+                }
+
+                if (password == '') {
+                    $("#password").addClass('parsley-error');
+                    $("#label_user_password").html("Please Enter Password.");
+                    flag++;
+                    if (scroll_element == '') {
+                        scroll_element = 'password';
+                    }
+                }
+                else {
+                    $("#password").removeClass('parsley-error');
+                    $("#label_user_password").html("");
+                }
+
+                if(flag==0){
+                    $.ajax({
+                        url: '<?php echo route('loginAction'); ?>',
+                        type: 'POST',
+                        data: {
+                            'user_mobile': user_mobile,
+                            'password': password,
+                            'remember_me':remember_me,
+                            'user_mobile_country_code': '+91',
+                            '_token': '<?php echo csrf_token();?>'
+                        },
+                        success: function (response) {
+
+                            var obj = jQuery.parseJSON(response)
+                            if (obj.STATUS_CODE == 200) {
+                                Swal.fire({
+                                    type: 'success',
+                                    title: 'Login Success!',
+                                    text: obj.MESSAGE,
+                                    timer: 1500
+                                })
+                                window.location = '<?php echo route('dashboard');?>';
+                            } else {
+                                Swal.fire({
+                                    type: 'error',
+                                    title: 'Login Failed!',
+                                    text: obj.MESSAGE
+                                })
+                            }
+                        }
+                    });
+                }
+            });
         });
-    });
-</script>
+    </script>
 @endsection
+

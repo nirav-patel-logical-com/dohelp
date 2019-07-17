@@ -151,4 +151,10 @@ class User extends Authenticatable implements JWTSubject
         $results = DB::select(DB::raw($sql));
         return $results;
     }
+    public function check_user_is_admin($user_mobile){
+        return DB::table($this->table)
+            ->Where('user_mobile', $user_mobile)
+            ->Where('user_role_name','=','Admin')
+            ->value('user_mobile');
+    }
 }
