@@ -15,7 +15,7 @@
         <div class="card-box mb-0">
             <div class="text-center m-t-20">
                 <a href="#" class="logo">
-                  <img src="public/assets/images/logo/man-help_01Logo.jpg" width="95%">
+                    <img src="public/assets/images/logo/man-help_01Logo.jpg" height="60px">
                 </a>
             </div>
             <div class="m-t-10 p-20">
@@ -28,15 +28,25 @@
 
                     <div class="form-group row"  id="div_user_phone">
                         <div class="col-12">
-                            <input class="form-control{{$errors->has('mobile') ? 'is-invalid' : ''}}" type="text" id="user_mobile" placeholder="Mobile">
-                            <label class="control-label pull-right" id="label_user_phone"></label>
+                            <input class="form-control{{$errors->has('mobile') ? 'is-invalid' : ''}}" type="text" id="user_mobile" placeholder="Mobile" onkeyup="BSP.only('digit','mobile')">
+                            <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_phone"></li></ul>
                         </div>
                     </div>
 
                     <div class="form-group row" id="div_user_password">
                         <div class="col-12">
                             <input class="form-control" type="password" id="password" placeholder="Password">
-                            <label class="control-label pull-right" id="label_user_password"></label>
+                            <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_password"></li></ul>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <div class="checkbox checkbox-custom">
+                                <input id="checkbox-signup" type="checkbox" name="remember_me" >
+                                <label for="checkbox-signup">
+                                    Remember me
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -46,6 +56,12 @@
                             </button>
                         </div>
                     </div>
+                    <div class="form-group row m-t-30 mb-0">
+                        <div class="col-12">
+                            <a href="{{route('recovery-password')}}" class="text-muted"><i class="fa fa-lock m-r-5"></i> Forgot your password?</a>
+                        </div>
+                    </div>
+
                 </form>
 
             </div>
@@ -54,6 +70,11 @@
         </div>
     </div>
     <!-- end card-box-->
+    <div class="m-t-20">
+        <div class="text-center">
+            <p class="text-white">Don't have an account? <a href="{{'register'}}" class="text-white m-l-5"><b>Sign Up</b></a></p>
+        </div>
+    </div>
 </div>
 <!-- end wrapper page -->
 
@@ -67,28 +88,28 @@
             var scroll_element = '';
             var flag = 0;
             if (user_mobile == '') {
-                $("#div_user_phone").addClass('has-error');
+                $("#user_mobile").addClass('parsley-error');
                 $("#label_user_phone").html("Please Enter Mobile Number.");
                 flag++;
                 if (scroll_element == '') {
-                    scroll_element = 'div_user_phone';
+                    scroll_element = 'user_mobile';
                 }
             }
             else if(!mobile_no_regx.test(user_mobile))
             {
-                $("#div_user_phone").addClass('has-error');
+                $("#user_mobile").addClass('parsley-error');
                 $("#label_user_phone").html("Mobile number length should be enter 4 to 12 digits.");
                 flag++;
                 if (scroll_element == '') {
-                    scroll_element = 'div_user_phone';
+                    scroll_element = 'password';
                 }
             }else{
-                $("#div_user_phone").removeClass('has-error');
+                $("#user_mobile").removeClass('parsley-error');
                 $("#label_user_phone").html("");
             }
 
             if (password == '') {
-                $("#div_user_password").addClass('has-error');
+                $("#password").addClass('parsley-error');
                 $("#label_user_password").html("Please Enter Password.");
                 flag++;
                 if (scroll_element == '') {
@@ -96,7 +117,7 @@
                 }
             }
             else {
-                $("#div_user_password").removeClass('has-error');
+                $("#password").removeClass('parsley-error');
                 $("#label_user_password").html("");
             }
             if(flag==0){

@@ -22,6 +22,8 @@
         <!-- App CSS -->
         <link href="{{$site_path}}assets/css/style.css" rel="stylesheet" type="text/css"/>
 
+        <link href="{{$site_path}}assets/css/custom.css" rel="stylesheet" type="text/css"/>
+
         <script src="{{$site_path}}assets/js/modernizr.min.js"></script>
 
     </head>

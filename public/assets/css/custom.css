@@ -1,0 +1,17 @@
+.wrapper-page .account-bg
+{
+    background-color: transparent !important;
+}
+.account-pages
+{
+    background-color: #2d84d1 !important;
+}
+.wrapper-page .card-box
+{
+    border: 5px solid #65cff9;
+}
+.btn-success
+{
+    background-color: #2d84d1 !important;
+    border-color: #2d84d1 !important;
+}
