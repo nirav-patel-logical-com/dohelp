@@ -393,4 +393,127 @@ class UsersController extends Controller{
             $BSPController->send_response_api(400, 'Invalid Request.', '');
         }
     }
+
+    public function memberList(){
+        return response()
+            ->view('member.member-list');
+    }
+
+    public function user_list_post(Request $request){
+        $user = new User();
+        $columns = array(
+            0 => 'id',
+            1 => 'user_name',
+            2 => 'user_unique_id',
+            3 => 'user_mobile',
+            4 => 'user_city',
+            5 => 'user_reference_number',
+            6 => 'user_status',
+            7 => 'id'
+        );
+
+        $total =DB::table('users')
+            ->Where('user_role_name','!=','Admin')
+            ->count();
+        $totalData = $total;
+        $totalFiltered = $total;
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+        $search = $request->input('search.value');
+
+        if (empty($search)) {
+            $posts = $user->getUserList($start, $limit, $order, $dir);
+        } else {
+
+            $posts = $user->getUserList($start, $limit, $order, $dir, $search);
+            $totalFiltered = count($posts);
+        }
+        $data = array();
+        if (!empty($posts)) {
+
+            foreach ($posts as $post) {
+                $status = "<a class='font-green-sharp' onclick='status_change({$post->id},&#39{$post->user_status}&#39);' title='Status' ><span>" . $post->user_status . "</span></a>";
+                $show = route('user_view', $post->id);
+                $edit = route('user_edit', $post->id);
+                $edit_view ="<a href='{$show}' title='View' ><i class='font-green-sharp fa fa-eye-slash'></i> </a>";
+                $nestedData['id'] = $post->id;
+                $nestedData['user_name'] = $post->user_name;
+                $nestedData['user_unique_id'] = $post->user_unique_id;
+                $nestedData['user_mobile'] = $post->user_mobile;
+                $nestedData['user_city'] = $post->user_city;
+                $nestedData['user_reference_number'] = $post->user_reference_number;
+                $nestedData['user_status'] =  "{$status}";
+                $nestedData['action'] = "{$edit_view}
+                                          &emsp;<a href='{$edit}' title='EDIT' ><i class='font-green-sharp fa fa-pencil-square-o'></i></a>";
+                $data[] = $nestedData;
+
+            }
+        }
+
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $data
+        );
+
+        echo json_encode($json_data);
+    }
+
+    public function change_user_status()
+    {
+        $BSPController = new BSPController();
+        if (isset($_POST['id']) && !empty($_POST['id']) && isset($_POST['status']) && !empty($_POST['status'])) {
+            $id = $_POST['id'];
+
+            if ($_POST['status'] === 'Active') {
+                $status = 'Inactive';
+            } else {
+                $status = 'Active';
+            }
+
+            $user_data = DB::table('users')
+                ->where('id', $id)
+                ->update(['user_status' => $status
+                ]);
+
+            if ($user_data) {
+                $BSPController->send_response_api(200, 'Status is ' . $status, '');
+            } else {
+                $BSPController->send_response_api(400, 'Status Can not be updated..', '');
+            }
+        } else {
+            $BSPController->send_response_api(400, 'Invalid Request.', '');
+        }
+    }
+    /*display User details page*/
+    public function user_view($id)
+    {
+        $Users = new User();
+        $user_data = $Users->get_user_details_by_user_id($id);
+        if(isset($user_data[0]->user_image) && !empty($user_data[0]->user_image)){
+            $user_data[0]->user_image = env('APP_URL').'public/user_image'.$user_data[0]->user_image;
+        }else{
+            $user_data[0]->user_image = env('APP_URL').'public/assets/images/users/avatar-1.jpg';
+        }
+        $data['user_data'] = $user_data[0];
+        return response()
+            ->view('member.user-view', ['user_data' => $data]);
+
+    }
+
+    /*start insert admin details*/
+
+
+    /*end user details*/
+    public function user_edit($id)
+    {
+        $Users = new User();
+        $user_data = $Users->get_user_details_by_user_id($id);
+        return response()->view('member.user-edit', ['user_data' => $user_data[0]]);
+    }
+
 }

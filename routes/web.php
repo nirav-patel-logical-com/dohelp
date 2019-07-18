@@ -22,3 +22,8 @@ Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
 Route::post('login-action', 'LoginController@loginAction')->name('loginAction');
 Route::post('register-action', 'UsersController@registerAction')->name('registerAction');
 Route::post('recovery-password-action', 'UsersController@recoveryPasswordAction')->name('recoveryPasswordAction');
+
+/*Member Route Start*/
+Route::get('/member', 'UsersController@memberList')->name('memberList');
+Route::get('user-view/{id}', ['as' => 'user_view', 'uses' => 'UsersController@user_view']);
+Route::get('user-edit/{id}', [ 'as' => 'user_edit', 'uses' => 'UsersController@user_edit']);

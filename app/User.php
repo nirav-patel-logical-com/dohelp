@@ -86,6 +86,8 @@ class User extends Authenticatable implements JWTSubject
                     'user_city',
                     'user_reference_number',
                     'user_status',
+                    'user_gender',
+                    'user_image',
                     'user_add_date',
                     'user_details_id',
                     'user_bank_name',
@@ -115,6 +117,8 @@ class User extends Authenticatable implements JWTSubject
                 'user_city',
                 'user_reference_number',
                 'user_status',
+                'user_gender',
+                'user_image',
                 'user_add_date',
                 'user_details_id',
                 'user_bank_name',
@@ -132,6 +136,54 @@ class User extends Authenticatable implements JWTSubject
             ->Where('user_role_name','!=','Admin')
             ->Where('id','=',$user_id)
             ->get();
+    }
+
+    public function getUserList($start, $limit, $order, $dir, $search = ''){
+
+        $con = "AND $this->table.user_role_name != 'Admin'";
+
+        $search_con = '';
+
+        if (isset($search) && !empty($search)) {
+            $search_con = "AND (
+            users.id LIKE '%" . $search . "%'
+            OR
+            users.user_name LIKE '%" . $search . "%'
+            OR
+            users.user_mobile LIKE '%" . $search . "%'
+            OR
+            users.user_city LIKE '%" . $search . "%'
+            OR
+            users.user_reference_number LIKE '%" . $search . "%'
+            OR
+            users.user_unique_id LIKE '%" . $search . "%'
+            OR
+            users.user_status LIKE '%" . $search . "%'
+            )";
+        }
+        $sql = "
+         	SELECT
+         	    `user_name`,
+         	    `id`,
+                `user_mobile_country_code`,
+                `user_mobile`,
+                `user_unique_id`,
+                `user_gender`,
+                `user_image`,
+                `user_city`,
+                `user_reference_number`,
+                `user_status`,
+                `user_add_date`
+         	FROM $this->table
+         	WHERE 1
+         	$con
+         	$search_con
+         	ORDER BY users.$order $dir
+         	LIMIT $start, $limit
+		";
+
+        $results = DB::select(DB::raw($sql));
+        return $results;
     }
     public function check_reference_number($user_reference_number){
         return DB::table($this->table)
