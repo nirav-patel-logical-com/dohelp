@@ -130,9 +130,28 @@ class User extends Authenticatable implements JWTSubject
                 'user_google_pay_number',
                 'user_details_amount',
                 'user_details_payment_date',
+                'user_details_by',
                 'user_details_image'
             )
             ->leftJoin('user_details', 'users.id', '=', 'user_details.user_id')
+            ->Where('user_role_name','!=','Admin')
+            ->Where('id','=',$user_id)
+            ->get();
+    }
+
+    public function get_user_details_for_dashboard($user_id)
+    {
+        return DB::table($this->table)
+            ->select('id',
+                'user_name',
+                'user_mobile_country_code',
+                'user_mobile',
+                'user_city',
+                'user_reference_number',
+                'user_gender',
+                'user_image',
+                'user_add_date'
+            )
             ->Where('user_role_name','!=','Admin')
             ->Where('id','=',$user_id)
             ->get();
@@ -190,6 +209,16 @@ class User extends Authenticatable implements JWTSubject
             ->Where('user_reference_number', $user_reference_number)
             ->Where('user_role_name','!=','Admin')
             ->value('user_reference_number');
+    }
+    public function check_mobile_exist($user_mobile){
+        return DB::table($this->table)
+            ->Where('user_mobile', $user_mobile)
+            ->value('id');
+    }
+    public function check_old_image($user_id){
+        return DB::table($this->table)
+            ->Where('id', $user_id)
+            ->value('user_image');
     }
     function get_user_password_by_user_id($user_id)
     {

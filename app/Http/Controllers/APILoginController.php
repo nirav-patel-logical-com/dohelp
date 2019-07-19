@@ -32,11 +32,18 @@ class APILoginController extends Controller
                         // if the credentials are wrong we send an unauthorized error in json format
                         return response()->json(['error' => 'Unauthorized'], 401);
                     }
+                    if(isset($login_data[0]->user_image) && !empty($login_data[0]->user_image)){
+                        $login_data[0]->user_image_url = env('APP_URL').'public/user_image/'.$login_data[0]->user_image;
+                    }else{
+                        $login_data[0]->user_image_url = env('APP_URL').'public/assets/images/users/avatar-1.jpg';
+                    }
                     $data['user_details'] = $login_data[0];
                     $data['token'] = $token;
                     $data['type'] = 'bearer';
                     $data['expires'] = auth('api')->factory()->getTTL() * 60; // time to expiration
                     $BSPController->send_response_api(200, 'Login Success', $data);
+                }else {
+                    $BSPController->send_response_api(401, 'Please enter valid password.', '');
                 }
             } else {
                 $BSPController->send_response_api(401, 'Please enter valid Username and password.', '');

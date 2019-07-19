@@ -12,9 +12,15 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 
 class UsersController extends Controller{
 
+    public function memberCreate(){
+        return response()
+            ->view('member.member-create');
+    }
     /*Create User API*/
     public function userCreate(){
         $User =new User();
@@ -31,12 +37,19 @@ class UsersController extends Controller{
             $user_paytm_number ='';
             $user_google_pay_number ='';
             $user_phone_pay_number ='';
+            $user_add_by =0;
             if(isset($_POST['user_reference_number']) && !empty($_POST['user_reference_number'])){
                 $user_reference_number = $_POST['user_reference_number'];
                 $check_reference_number = $User->check_reference_number($user_reference_number);
                 if(isset($check_reference_number) && empty($check_reference_number)){
                     $BSPController->send_response_api(400, 'Your Reference number not valid.', '');
+                    exit;
                 }
+            }
+            $check_mobile_exist = $User->check_mobile_exist($_POST['user_mobile']);
+            if(isset($check_mobile_exist) && empty($check_mobile_exist)){
+                $BSPController->send_response_api(400, 'Mobile Number exist.', '');
+                exit;
             }
             if(isset($_POST['user_bank_name']) && !empty($_POST['user_bank_name'])){
                 $user_bank_name =$_POST['user_bank_name'];
@@ -59,6 +72,9 @@ class UsersController extends Controller{
             if(isset($_POST['user_google_pay_number']) && !empty($_POST['user_google_pay_number'])){
                 $user_google_pay_number =$_POST['user_google_pay_number'];
             }
+            if(isset($_POST['user_add_by']) && !empty($_POST['user_add_by'])){
+                $user_add_by =$_POST['user_add_by'];
+            }
             $user_unique_id = $BSPController->generateRandomString();
             $user_unique_id = 'MH'.$user_unique_id;
             $user_id = DB::table('users')->insertGetId([
@@ -71,7 +87,7 @@ class UsersController extends Controller{
                  'user_role_name' => 'User',
                  'user_status' => 'Inactive',
                  'user_add_date' => time(),
-                 'user_add_by' => 0,
+                 'user_add_by' => $user_add_by,
             ]);
             $user_details_id = DB::table('user_details')->insertGetId([
                 'user_id' => $user_id,
@@ -87,15 +103,16 @@ class UsersController extends Controller{
                 'user_details_payment_date' => '',
                 'user_details_by' => '',
                 'user_details_image' => '',
-                'user_details_add_by' => $user_id,
+                'user_details_add_by' => $user_add_by,
             ]);
-            $BSPController->send_response_api(201, 'User added successfully please contact to admin', $user_id);
+            $BSPController->send_response_api(200, 'User added successfully please contact to admin', $user_id);
         }else{
             $BSPController->send_response_api(400, 'Invalid Request.', '');
         }
     }
     /*Create User API*/
     public function userEdit(){
+      // dd($_POST);
         $User =new User();
         $BSPController =new BSPController();
         if (isset($_POST['user_name']) && !empty($_POST['user_name']) &&
@@ -110,12 +127,30 @@ class UsersController extends Controller{
             $user_paytm_number ='';
             $user_google_pay_number ='';
             $user_phone_pay_number ='';
+            $user_gender ='';
+            $user_image ='';
+            $user_modify_by ='';
+            $user_id =$_POST['user_id'];
             if(isset($_POST['user_reference_number']) && !empty($_POST['user_reference_number'])){
                 $user_reference_number = $_POST['user_reference_number'];
                 $check_reference_number = $User->check_reference_number($user_reference_number);
                 if(isset($check_reference_number) && empty($check_reference_number)){
                     $BSPController->send_response_api(400, 'Your Reference number not valid.', '');
                 }
+            }
+            $check_mobile_exist = $User->check_mobile_exist($_POST['user_mobile']);
+            if(isset($check_mobile_exist) && empty($check_mobile_exist) && $check_mobile_exist !=$user_id){
+                $BSPController->send_response_api(400, 'Mobile Number exist.', '');
+                exit;
+            }
+            if(isset($_POST['user_gender']) && !empty($_POST['user_gender'])){
+                $user_gender =$_POST['user_gender'];
+            }
+            $check_old_image = $User->check_old_image($user_id);
+            if(isset($_POST['user_image']) && !empty($_POST['user_image'])){
+                $user_image =$_POST['user_image'];
+            }elseif(isset($check_old_image) && !empty($check_old_image)){
+                $user_image = $check_old_image;
             }
             if(isset($_POST['user_bank_name']) && !empty($_POST['user_bank_name'])){
                 $user_bank_name =$_POST['user_bank_name'];
@@ -138,7 +173,11 @@ class UsersController extends Controller{
             if(isset($_POST['user_google_pay_number']) && !empty($_POST['user_google_pay_number'])){
                 $user_google_pay_number =$_POST['user_google_pay_number'];
             }
-            $user_id =$_POST['user_id'];
+            if(isset($_POST['user_add_by']) && !empty($_POST['user_add_by'])){
+                $user_modify_by =$_POST['user_add_by'];
+            }else{
+                $user_modify_by = $user_id;
+            }
             DB::table('users')
                 ->where('id', $user_id)
                 ->update([
@@ -146,12 +185,14 @@ class UsersController extends Controller{
                 'user_mobile' => $_POST['user_mobile'],
                 'user_mobile_country_code' => '+91',
                 'user_city' => $_POST['user_city'],
+                'user_image' => $user_image,
+                'user_gender' => $user_gender,
                 'user_reference_number' => $user_reference_number,
                 'user_modify_date' => time(),
-                'user_modify_by' => $user_id,
+                'user_modify_by' => $user_modify_by,
             ]);
             DB::table('user_details')
-                ->where('id', $user_id)
+                ->where('user_id', $user_id)
                 ->update([
                 'user_bank_name' => $user_bank_name,
                 'user_bank_number' => $user_bank_number,
@@ -161,9 +202,9 @@ class UsersController extends Controller{
                 'user_phone_pay_number' => $user_phone_pay_number,
                 'user_google_pay_number' => $user_google_pay_number,
                 'user_details_modify_date' => time(),
-                'user_details_modify_by' => $user_id
+                'user_details_modify_by' => $user_modify_by
             ]);
-            $BSPController->send_response_api(201, 'User data update successfully.', $user_id);
+            $BSPController->send_response_api(200, 'User data update successfully.', $user_id);
         }else{
             $BSPController->send_response_api(400, 'Invalid Request.', '');
         }
@@ -282,6 +323,11 @@ class UsersController extends Controller{
         $BSPController =new BSPController();
         $user_id = $_POST['user_id'];
         $user_details = $User->get_user_details_by_user_id($user_id);
+        if(isset($user_details[0]->user_image) && !empty($user_details[0]->user_image)){
+            $user_details[0]->user_image_url = env('APP_URL').'public/user_image/'.$user_details[0]->user_image;
+        }else{
+            $user_details[0]->user_image_url = env('APP_URL').'public/assets/images/users/avatar-1.jpg';
+        }
         if(isset($user_details) && !empty($user_details)){
             $BSPController->send_response_api(200, 'Record Found', $user_details);
         }else{
@@ -330,6 +376,9 @@ class UsersController extends Controller{
             $user_paytm_number ='';
             $user_google_pay_number ='';
             $user_phone_pay_number ='';
+            $user_gender ='';
+            $user_image ='';
+            $user_add_by =0;
             if(isset($_POST['user_reference_number']) && !empty($_POST['user_reference_number'])){
                 $user_reference_number = $_POST['user_reference_number'];
                 $check_reference_number = $User->check_reference_number($user_reference_number);
@@ -339,6 +388,12 @@ class UsersController extends Controller{
             }
             if(isset($_POST['user_bank_name']) && !empty($_POST['user_bank_name'])){
                 $user_bank_name =$_POST['user_bank_name'];
+            }
+            if(isset($_POST['user_gender']) && !empty($_POST['user_gender'])){
+                $user_gender =$_POST['user_gender'];
+            }
+            if(isset($_POST['user_image']) && !empty($_POST['user_image'])){
+                $user_image = $_POST['user_image'];
             }
             if(isset($_POST['user_bank_number']) && !empty($_POST['user_bank_number'])){
                 $user_bank_number =$_POST['user_bank_number'];
@@ -358,6 +413,9 @@ class UsersController extends Controller{
             if(isset($_POST['user_google_pay_number']) && !empty($_POST['user_google_pay_number'])){
                 $user_google_pay_number =$_POST['user_google_pay_number'];
             }
+            if(isset($_POST['user_add_by']) && !empty($_POST['user_add_by'])){
+                $user_add_by =$_POST['user_add_by'];
+            }
             $user_unique_id = $BSPController->generateRandomString();
             $user_unique_id = 'MH'.$user_unique_id;
             $user_id = DB::table('users')->insertGetId([
@@ -365,12 +423,14 @@ class UsersController extends Controller{
                 'user_mobile' => $_POST['user_mobile'],
                 'user_mobile_country_code' => '+91',
                 'user_city' => $_POST['user_city'],
+                'user_gender' => $user_gender,
+                'user_image' => $user_image,
                 'user_reference_number' => $user_reference_number,
                 'user_unique_id' => $user_unique_id,
                 'user_role_name' => 'User',
                 'user_status' => 'Inactive',
                 'user_add_date' => time(),
-                'user_add_by' => 0,
+                'user_add_by' => $user_add_by,
             ]);
             $user_details_id = DB::table('user_details')->insertGetId([
                 'user_id' => $user_id,
@@ -386,9 +446,9 @@ class UsersController extends Controller{
                 'user_details_payment_date' => '',
                 'user_details_by' => '',
                 'user_details_image' => '',
-                'user_details_add_by' => $user_id,
+                'user_details_add_by' => $user_add_by,
             ]);
-            $BSPController->send_response_api(201, 'User added successfully please contact to admin', $user_id);
+            $BSPController->send_response_api(200, 'User added successfully please contact to admin', $user_id);
         }else{
             $BSPController->send_response_api(400, 'Invalid Request.', '');
         }
@@ -439,6 +499,8 @@ class UsersController extends Controller{
                 $show = route('user_view', $post->id);
                 $edit = route('user_edit', $post->id);
                 $edit_view ="<a href='{$show}' title='View' ><i class='font-green-sharp fa fa-eye-slash'></i> </a>";
+                $get_help_button ="<button class='btn btn-primary waves-effect waves-light' data-toggle='modal' data-id='$post->id' data-help='Get'>Assign get Help</button>";
+                $paid_help_button ="<button class='btn btn-primary waves-effect waves-light' data-toggle='modal' data-id='$post->id' data-help='Paid'>Assign Paid Help</button>";
                 $nestedData['id'] = $post->id;
                 $nestedData['user_name'] = $post->user_name;
                 $nestedData['user_unique_id'] = $post->user_unique_id;
@@ -446,7 +508,7 @@ class UsersController extends Controller{
                 $nestedData['user_city'] = $post->user_city;
                 $nestedData['user_reference_number'] = $post->user_reference_number;
                 $nestedData['user_status'] =  "{$status}";
-                $nestedData['action'] = "{$edit_view}
+                $nestedData['action'] = "{$get_help_button} {$paid_help_button}&emsp;{$edit_view}
                                           &emsp;<a href='{$edit}' title='EDIT' ><i class='font-green-sharp fa fa-pencil-square-o'></i></a>";
                 $data[] = $nestedData;
 
@@ -495,16 +557,32 @@ class UsersController extends Controller{
         $Users = new User();
         $user_data = $Users->get_user_details_by_user_id($id);
         if(isset($user_data[0]->user_image) && !empty($user_data[0]->user_image)){
-            $user_data[0]->user_image = env('APP_URL').'public/user_image'.$user_data[0]->user_image;
+            $user_data[0]->user_image_url = env('APP_URL').'public/user_image/'.$user_data[0]->user_image;
         }else{
-            $user_data[0]->user_image = env('APP_URL').'public/assets/images/users/avatar-1.jpg';
+            $user_data[0]->user_image_url = env('APP_URL').'public/assets/images/users/avatar-1.jpg';
         }
-        $data['user_data'] = $user_data[0];
+        if(isset($user_data[0]->user_details_image) && !empty($user_data[0]->user_details_image)){
+            $user_data[0]->user_details_image_url = env('APP_URL').'public/user_amount_proof/'.$user_data[0]->user_details_image;
+        }else{
+            $user_data[0]->user_details_image_url = '';
+        }
+
         return response()
-            ->view('member.user-view', ['user_data' => $data]);
+            ->view('member.user-view', ['user_data' =>   $user_data[0]]);
 
     }
 
+    public function user_view_api(){
+        $Users = new User();
+        $BSPController =new BSPController();
+        $user_data = $Users->get_user_details_by_user_id($_POST['user_id']);
+        if(isset($user_data[0]->user_image) && !empty($user_data[0]->user_image)){
+            $user_data[0]->user_image_url = env('APP_URL').'public/user_image/'.$user_data[0]->user_image;
+        }else{
+            $user_data[0]->user_image_url = env('APP_URL').'public/assets/images/users/avatar-1.jpg';
+        }
+        $BSPController->send_response_api(200, 'Success ', $user_data[0]);
+    }
     /*start insert admin details*/
 
 
@@ -513,7 +591,92 @@ class UsersController extends Controller{
     {
         $Users = new User();
         $user_data = $Users->get_user_details_by_user_id($id);
+        if(isset($user_data[0]->user_image) && !empty($user_data[0]->user_image)){
+            $user_data[0]->user_image_url = env('APP_URL').'public/user_image/'.$user_data[0]->user_image;
+        }else{
+            $user_data[0]->user_image_url = env('APP_URL').'public/assets/images/users/avatar-1.jpg';
+        }
+        //dd($user_data);
         return response()->view('member.user-edit', ['user_data' => $user_data[0]]);
     }
 
+    public function userImageUpload(){
+        $BSPController = new BSPController();
+        $uploadedFile = '';
+        $user_image_array =[];
+        if(!empty($_FILES["user_image"]["type"])){
+            $fileName = time().'_'.$_FILES['user_image']['name'];
+            $valid_extensions = array("jpeg", "jpg", "png");
+            $temporary = explode(".", $_FILES["user_image"]["name"]);
+            $file_extension = end($temporary);
+            if((($_FILES["user_image"]["type"] == "image/png") || ($_FILES["user_image"]["type"] == "image/jpg") || ($_FILES["user_image"]["type"] == "image/jpeg")) && in_array($file_extension, $valid_extensions)){
+                $sourcePath = $_FILES['user_image']['tmp_name'];
+                $targetPath = "public/user_image/".$fileName;
+                if(move_uploaded_file($sourcePath,$targetPath)){
+                    $uploadedFile = $fileName;
+                    $user_image_array['image_name'] =$uploadedFile;
+                    $user_image_array['image_url'] =env('APP_URL')."public/user_image/".$fileName;
+                    $BSPController->send_response_api(200, 'Image Uploaded', $user_image_array);
+                }else{
+                    $BSPController->send_response_api(400, 'Image not uploaded.', '');
+                }
+            }else{
+                $BSPController->send_response_api(400, 'Image not uploaded.', '');
+            }
+        }else{
+            $BSPController->send_response_api(400, 'Image not uploaded.', '');
+        }
+    }
+    public function add_fees_details(){
+
+        $user_id =$_POST['user_id'];
+        $uploadedFile ='';
+        if(!empty($_FILES["user_details_image"]["type"])){
+            $fileName = time().'_'.$_FILES['user_details_image']['name'];
+            $valid_extensions = array("jpeg", "jpg", "png");
+            $temporary = explode(".", $_FILES["user_details_image"]["name"]);
+            $file_extension = end($temporary);
+            if((($_FILES["user_details_image"]["type"] == "image/png") || ($_FILES["user_details_image"]["type"] == "image/jpg") || ($_FILES["user_details_image"]["type"] == "image/jpeg")) && in_array($file_extension, $valid_extensions)){
+                $sourcePath = $_FILES['user_details_image']['tmp_name'];
+                $targetPath = "public/user_amount_proof/".$fileName;
+                if(move_uploaded_file($sourcePath,$targetPath)){
+                    $uploadedFile = $fileName;
+                }else{
+                    return Redirect::back()->withErrors(['msg', 'Image not uploaded.']);
+                }
+            }else{
+                return Redirect::back()->withErrors(['msg', 'Image not uploaded.']);
+            }
+        }
+        if($_POST['user_details_amount'] && !empty($_POST['user_details_amount'])){
+            $user_details_by ='';
+           if(isset($_POST['user_details_by']) && !empty($_POST['user_details_by'])){
+               $user_details_by = $_POST['user_details_by'];
+           }
+            $payment_date =time();
+            DB::table('user_details')
+                ->where('user_id', $user_id)
+                ->update([
+                    'user_details_amount' => $_POST['user_details_amount'],
+                    'user_details_image' => $uploadedFile,
+                    'user_details_payment_date' => $payment_date,
+                    'user_details_by' => $user_details_by,
+                    'user_details_modify_date' => $payment_date,
+                    'user_details_modify_by' => $user_id
+                ]);
+            $fees_id = DB::table('fees_details')->insertGetId([
+                'fees_amount' => $_POST['user_details_amount'],
+                'fees_date' => $payment_date,
+                'fees_by' => $user_details_by,
+                'fees_image' => $uploadedFile,
+                'fees_user_id' => $user_id,
+                'fees_add_date' => $payment_date,
+                'fees_add_by' => $user_id,
+            ]);
+            return Redirect::back();
+        }
+    }
+    public function get_help_user_list(){
+
+    }
 }

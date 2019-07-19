@@ -4,7 +4,9 @@
  * User: vidhi_BSP
  * Date: 7/17/2019
  * Time: 6:52 PM
- */?>
+ */
+$login_data = Session::get('login_data');
+?>
 
 @extends('includes.base_account')
 
@@ -225,6 +227,7 @@
                             'user_google_pay_number': google_pay_number,
                             'user_reference_number':'<?php echo $id; ?>',
                             'user_mobile_country_code': '+91',
+                            'user_add_by': '<?php echo $login_data[0]->id ?>',
                             '_token': '<?php echo csrf_token();?>'
                         },
                         success: function (response) {
