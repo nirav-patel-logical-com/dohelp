@@ -47,14 +47,30 @@
 
         </div> <!-- content -->
         <!-- Modal -->
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="modelGetHelp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <h1>ID :: <span id="new_id"></span></h1>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Text in a modal</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End content-page -->
+        <!-- Modal -->
+        <div class="modal fade" id="modelPaidHelp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1>ID -paid :: <span id="new_id"></span></h1>
                     </div>
                     <div class="modal-body">
                         <h5>Text in a modal</h5>
@@ -140,5 +156,17 @@
                 }
             });
         }
+        $(document).on('click','.model-getHelp', function(event){
+            var dataId = $(this).attr("data-id");
+            var dataHelp = $(this).attr("data-help");
+            $('#modelGetHelp #new_id').html(dataId +'Help ::'+ dataHelp);
+        });
+        $(document).on('click','.model-paidHelp', function(event){
+            var dataId = $(this).attr("data-id");
+            var dataHelp = $(this).attr("data-help");
+            $('#modelPaidHelp #new_id').html(dataId +'Help ::'+ dataHelp);
+        });
+
+
     </script>
 @endsection

@@ -499,8 +499,8 @@ class UsersController extends Controller{
                 $show = route('user_view', $post->id);
                 $edit = route('user_edit', $post->id);
                 $edit_view ="<a href='{$show}' title='View' ><i class='font-green-sharp fa fa-eye-slash'></i> </a>";
-                $get_help_button ="<button class='btn btn-primary waves-effect waves-light' data-toggle='modal' data-id='$post->id' data-help='Get'>Assign get Help</button>";
-                $paid_help_button ="<button class='btn btn-primary waves-effect waves-light' data-toggle='modal' data-id='$post->id' data-help='Paid'>Assign Paid Help</button>";
+                $get_help_button ="<button class='btn btn-primary waves-effect waves-light model-getHelp' data-target='#modelGetHelp' data-toggle='modal' data-id='$post->id' data-help='Get'>Assign get Help</button>";
+                $paid_help_button ="<button class='btn btn-primary waves-effect waves-light model-paidHelp' data-target='#modelPaidHelp' data-toggle='modal' data-id='$post->id' data-help='Paid'>Assign Paid Help</button>";
                 $nestedData['id'] = $post->id;
                 $nestedData['user_name'] = $post->user_name;
                 $nestedData['user_unique_id'] = $post->user_unique_id;
