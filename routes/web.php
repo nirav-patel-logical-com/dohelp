@@ -13,7 +13,6 @@
 
 Route::get('/', 'LoginController@login')->name('login');
 Route::post('login-action', 'LoginController@loginAction')->name('loginAction');
-
 Route::middleware('guest')->group(function () {
     Route::get('/logout', 'LoginController@logout')->name('logout');
     Route::get('/recovery-password', 'UsersController@recoveryPassword')->name('recovery-password');
