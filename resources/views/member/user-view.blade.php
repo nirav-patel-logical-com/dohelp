@@ -5,6 +5,7 @@
  * Date: 7/18/2019
  * Time: 11:47 AM
  */
+$login_data = Session::get('login_data');
 ?>
 @extends('includes.base')
 
@@ -200,6 +201,7 @@
                             <form class="m-t-20" id="myFeesForm" method="post" enctype="multipart/form-data" action="{{route('add_fees_details')}}">
                                 @csrf
                                 <input type="hidden" name="user_id" value="{{$user_data->id}}">
+                                <input type="hidden" name="add_by" value="{{$user_data->id}}">
                                 <div class="form-group row">
                                     <div class="col-12">
                                         <input class="form-control" type="text" name="user_details_amount" id="user_amount" placeholder="Amount" onkeyup="BSP.only('int_flot','user_amount')">

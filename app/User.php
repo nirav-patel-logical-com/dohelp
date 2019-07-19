@@ -156,7 +156,45 @@ class User extends Authenticatable implements JWTSubject
             ->Where('id','=',$user_id)
             ->get();
     }
+    public function get_paid_user_list($user_id){
+        $sql = "
+         	SELECT
+         	    $this->table.`user_name`,
+         	    $this->table.`id`
+         	FROM $this->table
+            JOIN fees_details ON $this->table.id = fees_details.fees_user_id
+            LEFT JOIN paid_help ON fees_details.fees_id = paid_help.fess_id
+         	WHERE $this->table.id != $user_id
+		";
 
+        $results = DB::select(DB::raw($sql));
+        return $results;
+    }
+    public function get_help_count($user_id){
+        return DB::table('get_help')
+            ->Where('assign_id','=',$user_id)
+            ->count();
+    }
+    public function paid_help_count($user_id){
+        return DB::table('paid_help')
+            ->Where('assign_id','=',$user_id)
+            ->count();
+    }
+
+    public function get_get_user_list($user_id){
+        $sql = "
+         	SELECT
+         	    $this->table.`user_name`,
+         	    $this->table.`id`
+         	FROM $this->table
+            JOIN fees_details ON $this->table.id = fees_details.fees_user_id
+            LEFT JOIN get_help ON fees_details.fees_id = get_help.fess_id
+         	WHERE $this->table.id != $user_id
+		";
+
+        $results = DB::select(DB::raw($sql));
+        return $results;
+    }
     public function getUserList($start, $limit, $order, $dir, $search = ''){
 
         $con = "AND $this->table.user_role_name != 'Admin'";

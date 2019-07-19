@@ -53,6 +53,8 @@ class LoginController extends Controller{
                     }
                     $this->set_session_during_back_end_login($login_data);
                     $BSPController->send_response_api(200, 'Login Success', $login_data[0]);
+                } else {
+                    $BSPController->send_response_api(401, 'Please enter valid password.', '');
                 }
             } else {
                 $BSPController->send_response_api(401, 'Please enter valid Username and password.', '');

@@ -31,6 +31,8 @@ Route::post('changePassword',['middleware'=>'jwt.auth','uses'=>'UsersController@
 Route::post('logout',['middleware'=>'jwt.auth','uses'=>'APILoginController@logout']);
 Route::post('user_view_api', 'UsersController@user_view_api')->name('user_view_api');
 Route::post('dashboard','DashboardController@dashboardAPI')->name('dashboard');
+Route::post('GetHelpList','HelpController@GetHelpList')->name('GetHelpList');
+Route::post('PaidHelpList','HelpController@PaidHelpList')->name('PaidHelpList');
 
 /*Web Route for API call*/
 Route::post('user_list_post','UsersController@user_list_post')->name('user_list_post');
@@ -39,5 +41,6 @@ Route::post('user_details_update','UsersController@user_details_update')->name('
 Route::post('change_user_status','UsersController@change_user_status')->name('change_user_status');
 Route::post('userEditAction','UsersController@userEdit')->name('userEditAction');
 Route::post('userCreateAction','UsersController@userCreate')->name('userCreateAction');
-Route::post('get_help_user_list','UsersController@get_help_user_list')->name('get_help_user_list');
+Route::post('get_paid_user_list','UsersController@get_paid_user_list')->name('get_paid_user_list');
+Route::post('GetPaidAssignAction','HelpController@GetPaidAssignAction')->name('GetPaidAssignAction');
 

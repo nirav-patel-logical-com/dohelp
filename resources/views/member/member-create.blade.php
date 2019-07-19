@@ -5,7 +5,6 @@
  * Date: 7/18/2019
  * Time: 11:47 AM
  */
-$login_data = Session::get('login_data');
 ?>
 @extends('includes.base')
 

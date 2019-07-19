@@ -35,12 +35,12 @@
                             <table id="post" class="table table-bordered table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
-                                    <th>Id</th>
-                                    <th>User Name</th>
-                                    <th>Unique Id</th>
+                                    <th>Sr. No.</th>
+                                    <th>Name</th>
                                     <th>Mobile</th>
                                     <th>City</th>
-                                    <th>Reference Number</th>
+                                    <th>Fee status</th>
+                                    <th>Get Help</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -75,7 +75,7 @@
                 //"processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "<?php echo route('user_list_post'); ?>",
+                    "url": "<?php echo route('get_help_list_post'); ?>",
                     "dataType": "json",
                     "type": "POST",
                     "data": {

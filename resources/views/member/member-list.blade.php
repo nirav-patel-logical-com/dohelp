@@ -1,3 +1,12 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: vidhi_BSP
+ * Date: 7/18/2019
+ * Time: 11:47 AM
+ */
+$login_data = Session::get('login_data');
+?>
 @extends('includes.base')
 
 @section('seo-tag')
@@ -8,6 +17,9 @@
     <!-- DataTables -->
     <link href="{{env('APP_URL')}}public/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
     <link href="{{env('APP_URL')}}public/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css"/>
+    <!-- Plugins css-->
+    <link href="{{env('APP_URL')}}public/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css"/>
+
 @endsection
 @section('page-title')
     <h4 class="page-title float-left">Member List</h4>
@@ -51,14 +63,18 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1>ID :: <span id="new_id"></span></h1>
+                        <h1>Get User</h1>
                     </div>
                     <div class="modal-body">
-                        <h5>Text in a modal</h5>
+                        <div class="col-md-12">
+                            <select id='myGetUser' class="form-control select2">
+                            </select>
+                            <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_myGetUser"></li></ul>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button class="btn btn-success waves-effect waves-light" type="button" id="submitBtnGetAssign">Assign</button>
                     </div>
                 </div>
             </div>
@@ -70,14 +86,20 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1>ID -paid :: <span id="new_id"></span></h1>
+                        <h1>Paid User </h1>
                     </div>
                     <div class="modal-body">
-                        <h5>Text in a modal</h5>
+                        <div class="col-md-12">
+                            <select id='myPaidUser' class="form-control select2">
+                            </select>
+                            <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_myPaidUser"></li></ul>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
+
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button class="btn btn-success waves-effect waves-light" type="button" id="submitBtnPaidAssign">Assign</button>
                     </div>
                 </div>
             </div>
@@ -96,6 +118,10 @@
     <script src="{{env('APP_URL')}}public/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="{{env('APP_URL')}}public/plugins/datatables/dataTables.bootstrap4.min.js"></script>
     <script src="{{env('APP_URL')}}public/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="{{env('APP_URL')}}public/plugins/bootstrap-tagsinput/js/bootstrap-tagsinput.js"></script>
+
+    <script src="{{env('APP_URL')}}public/plugins/select2/js/select2.full.min.js"></script>
+
     <script>
         $(document).ready(function () {
             //$('#post').DataTable();
@@ -157,16 +183,155 @@
             });
         }
         $(document).on('click','.model-getHelp', function(event){
+            $('#modelGetHelp #myGetUser').empty();
             var dataId = $(this).attr("data-id");
             var dataHelp = $(this).attr("data-help");
             $('#modelGetHelp #new_id').html(dataId +'Help ::'+ dataHelp);
+            $.ajax({
+                url: '{{route('get_paid_user_list')}}',
+                method: 'POST',
+                data: {
+                    'user_id': dataId,
+                    'get_help': dataHelp,
+                    '_token': '<?php echo csrf_token();?>'
+                },
+                success: function (response) {
+                    var obj = jQuery.parseJSON(response);
+                    for (var field in obj['DATA']) {
+                        $('<option value="'+ obj['DATA'][field].id +'">' + obj['DATA'][field].user_name + '</option>').appendTo('#modelGetHelp #myGetUser');
+                    }
+                }
+            });
         });
         $(document).on('click','.model-paidHelp', function(event){
+            $('#modelPaidHelp #myPaidUser').empty(); // <<<<<< No more issue here
             var dataId = $(this).attr("data-id");
             var dataHelp = $(this).attr("data-help");
             $('#modelPaidHelp #new_id').html(dataId +'Help ::'+ dataHelp);
+            $.ajax({
+                url: '{{route('get_paid_user_list')}}',
+                method: 'POST',
+                data: {
+                    'user_id': dataId,
+                    'get_help': dataHelp,
+                    '_token': '<?php echo csrf_token();?>'
+                },
+                success: function (response) {
+                    var obj = jQuery.parseJSON(response);
+                    for (var field in obj['DATA']) {
+                        $('<option value="'+ obj['DATA'][field].id +'">' + obj['DATA'][field].user_name + '</option>').appendTo('#modelPaidHelp #myPaidUser');
+                    }
+                }
+            });
         });
 
+        $("#submitBtnPaidAssign").click(function(){
 
+            var myPaidUser = $("#myPaidUser").val();
+
+            var scroll_element = '';
+            var flag = 0;
+            if (myPaidUser == '') {
+                $("#myPaidUser").addClass('parsley-error');
+                $("#label_myPaidUser").html("Please Enter Mobile Number.");
+                flag++;
+                if (scroll_element == '') {
+                    scroll_element = 'myPaidUser';
+                }
+            }
+           else{
+                $("#myPaidUser").removeClass('parsley-error');
+                $("#label_myPaidUser").html("");
+            }
+
+
+            if(flag==0){
+
+                $.ajax({
+                    url: '<?php echo route('GetPaidAssignAction'); ?>',
+                    type: 'POST',
+                    data: {
+                        'assign_id': myPaidUser,
+                        'type': 'Paid',
+                        'user_add_by': '<?php echo $login_data[0]->id ?>',
+                        '_token': '<?php echo csrf_token();?>'
+                    },
+                    success: function (response) {
+
+                        var obj = jQuery.parseJSON(response)
+                        if (obj.STATUS_CODE == 200) {
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Success!',
+                                text: obj.MESSAGE,
+                                timer: 1500
+                            })
+                            window.location = '<?php echo route('memberList');?>';
+                        } else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Failed!',
+                                text: obj.MESSAGE
+                            })
+                        }
+                    }
+                });
+
+            }
+        });
+        $("#submitBtnGetAssign").click(function(){
+
+            var myGetUser = $("#myGetUser").val();
+
+            var scroll_element = '';
+            var flag = 0;
+            if (myGetUser == '') {
+                $("#myGetUser").addClass('parsley-error');
+                $("#label_myGetUser").html("Please Enter Mobile Number.");
+                flag++;
+                if (scroll_element == '') {
+                    scroll_element = 'myPaidUser';
+                }
+            }
+            else{
+                $("#myGetUser").removeClass('parsley-error');
+                $("#label_myGetUser").html("");
+            }
+
+
+            if(flag==0){
+
+                $.ajax({
+                    url: '<?php echo route('GetPaidAssignAction'); ?>',
+                    type: 'POST',
+                    data: {
+                        'assign_id': myGetUser,
+                        'type': 'Get',
+                        'user_add_by': '<?php echo $login_data[0]->id ?>',
+                        '_token': '<?php echo csrf_token();?>'
+                    },
+                    success: function (response) {
+
+                        var obj = jQuery.parseJSON(response)
+                        if (obj.STATUS_CODE == 200) {
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Success!',
+                                text: obj.MESSAGE,
+                                timer: 1500
+                            })
+                            window.location = '<?php echo route('memberList');?>';
+                        } else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Failed!',
+                                text: obj.MESSAGE
+                            })
+                        }
+                    }
+                });
+
+            }
+        });
     </script>
 @endsection
