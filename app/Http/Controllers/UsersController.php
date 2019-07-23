@@ -24,9 +24,21 @@ class UsersController extends Controller
             ->view('member.member-create');
     }
 
+    public function user_create_success($u_id,$mobile){
+        $password =DB::table('users')
+            ->Where('user_status', 'Active')
+            ->Where('user_unique_id', $u_id)
+            ->Where('user_role_name','!=','Admin')
+            ->value('password');
+        return response()
+            ->view('member.member-create-success',[
+                'u_id'=>$u_id,'mobile'=>$mobile,'password'=>$password]);
+    }
+
     /*Create User API*/
     public function userCreate()
     {
+        //dd($_POST);
         $User = new User();
         $BSPController = new BSPController();
         if (isset($_POST['user_name']) && !empty($_POST['user_name']) &&
@@ -50,11 +62,11 @@ class UsersController extends Controller
                     exit;
                 }
             }
-            $check_mobile_exist = $User->check_mobile_exist($_POST['user_mobile']);
-            if (isset($check_mobile_exist) && empty($check_mobile_exist)) {
-                $BSPController->send_response_api(400, 'Mobile Number exist.', '');
-                exit;
-            }
+//            $check_mobile_exist = $User->check_mobile_exist($_POST['user_mobile']);
+//            if (isset($check_mobile_exist) && empty($check_mobile_exist)) {
+//                $BSPController->send_response_api(400, 'Mobile Number exist.', '');
+//                exit;
+//            }
             if (isset($_POST['user_bank_name']) && !empty($_POST['user_bank_name'])) {
                 $user_bank_name = $_POST['user_bank_name'];
             }
@@ -81,18 +93,127 @@ class UsersController extends Controller
             }
             $user_unique_id = $BSPController->generateRandomString();
             $user_unique_id = 'MH' . $user_unique_id;
+            $user_password = $BSPController->generateRandomStringPassword();
             $user_id = DB::table('users')->insertGetId([
                 'user_name' => $_POST['user_name'],
                 'user_mobile' => $_POST['user_mobile'],
                 'user_mobile_country_code' => '+91',
                 'user_city' => $_POST['user_city'],
+                'user_age' => $_POST['user_age'],
                 'user_reference_number' => $user_reference_number,
+                'password' => Hash::make($user_password),
+                'user_unique_id' => $user_unique_id,
+                'user_role_name' => 'User',
+                'user_status' => 'Active',
+                'user_add_date' => time(),
+                'user_add_by' => $user_add_by,
+            ]);
+            $site_settings = DB::table('site_setting')->orderBy('ss_id','desc')->get();
+            $user_details_id = DB::table('user_details')->insertGetId([
+                'user_id' => $user_id,
+                'user_bank_name' => $user_bank_name,
+                'user_bank_number' => $user_bank_number,
+                'user_IFSC_code' => $user_IFSC_code,
+                'user_bank_branch' => $user_bank_branch,
+                'user_paytm_number' => $user_paytm_number,
+                'user_phone_pay_number' => $user_phone_pay_number,
+                'user_google_pay_number' => $user_google_pay_number,
+                'user_details_add_date' => time(),
+                'user_details_amount' => $site_settings[0]->ss_total_amount,
+                'donation_fees' => $site_settings[0]->ss_donation,
+                'entry_fees' => $site_settings[0]->ss_entry_fees,
+                'discount' => $site_settings[0]->ss_discount,
+                'discount_amount' => $site_settings[0]->ss_discount_amount,
+                'user_details_payment_date' => time(),
+                'user_details_by' => '',
+                'user_details_image' => '',
+                'user_details_add_by' => $user_add_by,
+            ]);
+
+            $user_details['user_unique_id'] = $user_unique_id;
+            $user_details['user_mobile'] = $_POST['user_mobile'];
+            $user_details['redirect_url'] = env('APP_URL').'user_create_success/'. $user_unique_id.'/'.$_POST['user_mobile'];
+            $BSPController->send_response_api(200, 'User added successfully please contact to admin', $user_details);
+        } else {
+            $BSPController->send_response_api(400, 'Invalid Request.', '');
+        }
+    }
+
+    /*Create User API*/
+    public function userCreateAPI()
+    {
+        //dd($_POST);
+        $User = new User();
+        $BSPController = new BSPController();
+        if (isset($_POST['user_name']) && !empty($_POST['user_name']) &&
+            isset($_POST['user_mobile']) && !empty($_POST['user_mobile']) &&
+            isset($_POST['user_city']) && !empty($_POST['user_city'])&&
+            isset($_POST['user_age']) && !empty($_POST['user_age'])
+        ) {
+            $user_reference_number = '';
+            $user_bank_name = '';
+            $user_bank_number = '';
+            $user_IFSC_code = '';
+            $user_bank_branch = '';
+            $user_paytm_number = '';
+            $user_google_pay_number = '';
+            $user_phone_pay_number = '';
+            $user_add_by = 0;
+            if (isset($_POST['user_reference_number']) && !empty($_POST['user_reference_number'])) {
+                $user_reference_number = $_POST['user_reference_number'];
+                $check_reference_number = $User->check_reference_number($user_reference_number);
+                if (isset($check_reference_number) && empty($check_reference_number)) {
+                    $BSPController->send_response_api(400, 'Your Reference number not valid.', '');
+                    exit;
+                }
+            }
+//            $check_mobile_exist = $User->check_mobile_exist($_POST['user_mobile']);
+//            if (isset($check_mobile_exist) && empty($check_mobile_exist)) {
+//                $BSPController->send_response_api(400, 'Mobile Number exist.', '');
+//                exit;
+//            }
+            if (isset($_POST['user_bank_name']) && !empty($_POST['user_bank_name'])) {
+                $user_bank_name = $_POST['user_bank_name'];
+            }
+            if (isset($_POST['user_bank_number']) && !empty($_POST['user_bank_number'])) {
+                $user_bank_number = $_POST['user_bank_number'];
+            }
+            if (isset($_POST['user_IFSC_code']) && !empty($_POST['user_IFSC_code'])) {
+                $user_IFSC_code = $_POST['user_IFSC_code'];
+            }
+            if (isset($_POST['user_bank_branch']) && !empty($_POST['user_bank_branch'])) {
+                $user_bank_branch = $_POST['user_bank_branch'];
+            }
+            if (isset($_POST['user_paytm_number']) && !empty($_POST['user_paytm_number'])) {
+                $user_paytm_number = $_POST['user_paytm_number'];
+            }
+            if (isset($_POST['user_phone_pay_number']) && !empty($_POST['user_phone_pay_number'])) {
+                $user_phone_pay_number = $_POST['user_phone_pay_number'];
+            }
+            if (isset($_POST['user_google_pay_number']) && !empty($_POST['user_google_pay_number'])) {
+                $user_google_pay_number = $_POST['user_google_pay_number'];
+            }
+            if (isset($_POST['user_add_by']) && !empty($_POST['user_add_by'])) {
+                $user_add_by = $_POST['user_add_by'];
+            }
+            $user_unique_id = $BSPController->generateRandomString();
+            $user_unique_id = 'MH' . $user_unique_id;
+            $user_password = $BSPController->generateRandomStringPassword();
+            $user_id = DB::table('users')->insertGetId([
+                'user_name' => $_POST['user_name'],
+                'user_mobile' => $_POST['user_mobile'],
+                'user_mobile_country_code' => '+91',
+                'user_city' => $_POST['user_city'],
+                'user_age' => $_POST['user_age'],
+                'user_reference_number' => $user_reference_number,
+                'password' => Hash::make($user_password),
                 'user_unique_id' => $user_unique_id,
                 'user_role_name' => 'User',
                 'user_status' => 'Inactive',
                 'user_add_date' => time(),
                 'user_add_by' => $user_add_by,
             ]);
+
             $user_details_id = DB::table('user_details')->insertGetId([
                 'user_id' => $user_id,
                 'user_bank_name' => $user_bank_name,
@@ -104,17 +225,21 @@ class UsersController extends Controller
                 'user_google_pay_number' => $user_google_pay_number,
                 'user_details_add_date' => time(),
                 'user_details_amount' => '',
-                'user_details_payment_date' => '',
+                'donation_fees' => '',
+                'entry_fees' => '',
+                'discount' => '',
+                'discount_amount' => '',
+                'user_details_payment_date' => time(),
                 'user_details_by' => '',
                 'user_details_image' => '',
                 'user_details_add_by' => $user_add_by,
             ]);
-            $BSPController->send_response_api(200, 'User added successfully please contact to admin', $user_id);
+
+            $BSPController->send_response_api(200, 'User added successfully please contact to admin', '');
         } else {
             $BSPController->send_response_api(400, 'Invalid Request.', '');
         }
     }
-
     /*Create User API*/
     public function userEdit()
     {
@@ -144,14 +269,15 @@ class UsersController extends Controller
                     $BSPController->send_response_api(400, 'Your Reference number not valid.', '');
                 }
             }
-            $check_mobile_exist = $User->check_mobile_exist($_POST['user_mobile']);
-            if (isset($check_mobile_exist) && empty($check_mobile_exist) && $check_mobile_exist != $user_id) {
-                $BSPController->send_response_api(400, 'Mobile Number exist.', '');
-                exit;
-            }
+//            $check_mobile_exist = $User->check_mobile_exist($_POST['user_mobile']);
+//            if (isset($check_mobile_exist) && empty($check_mobile_exist) && $check_mobile_exist != $user_id) {
+//                $BSPController->send_response_api(400, 'Mobile Number exist.', '');
+//                exit;
+//            }
             if (isset($_POST['user_gender']) && !empty($_POST['user_gender'])) {
                 $user_gender = $_POST['user_gender'];
             }
+
             $check_old_image = $User->check_old_image($user_id);
             if (isset($_POST['user_image']) && !empty($_POST['user_image'])) {
                 $user_image = $_POST['user_image'];
@@ -191,6 +317,7 @@ class UsersController extends Controller
                     'user_mobile' => $_POST['user_mobile'],
                     'user_mobile_country_code' => '+91',
                     'user_city' => $_POST['user_city'],
+                    'user_age' => $_POST['user_age'],
                     'user_image' => $user_image,
                     'user_gender' => $user_gender,
                     'user_reference_number' => $user_reference_number,
@@ -293,6 +420,44 @@ class UsersController extends Controller
 
     }
 
+    public function forgotPasswordAPI(){
+        $BSPController = new BSPController();
+        $response = array();
+        $code = 404;
+        $status_message = "Invalid Request.";
+        if (isset($_POST['user_unique_id']) && !empty($_POST['user_unique_id'])) {
+            $user_unique_id = trim($_POST['user_unique_id']);
+            $User = new User();
+            $check_user_is_unique_id = $User->check_user_is_unique_id($user_unique_id);
+            if (isset($check_user_is_unique_id) && !empty($check_user_is_unique_id)) {
+                $new_pass_update = $BSPController->generateRandomString();
+                //Call function to update password
+                $user_mobile = $check_user_is_unique_id;
+                $change_password = DB::table('users')
+                    ->where('user_mobile', $user_mobile)
+                    ->update(['password' => Hash::make($new_pass_update),
+                        'user_modify_date' => time()
+                    ]);
+                $message = "Your new password is $new_pass_update.";
+                //$BSPController->send_sms($user_mobile,$message);
+                if ($change_password) {
+                    $code = 200;
+                    $status_message = "Your password send to your mobile number please check.";
+                }
+
+            } else {
+                $code = 400;
+                $status_message = "You are not authorize user.";
+            }
+
+        }else {
+            $code = 400;
+            $status_message = "You are not authorize user.";
+        }
+
+        $BSPController->send_response_api($code, $status_message, '');
+
+    }
     public function changePasswordWeb()
     {
         $response = array();
@@ -400,7 +565,7 @@ class UsersController extends Controller
                 $user_reference_number = $_POST['user_reference_number'];
                 $check_reference_number = $User->check_reference_number($user_reference_number);
                 if (isset($check_reference_number) && empty($check_reference_number)) {
-                    $BSPController->send_response_api(400, 'Your Reference number not valid.', '');
+                    $BSPController->send_response_api(400, 'Your Unique number not valid.You are not authorize person.', '');
                 }
             }
             if (isset($_POST['user_bank_name']) && !empty($_POST['user_bank_name'])) {
@@ -433,9 +598,10 @@ class UsersController extends Controller
             if (isset($_POST['user_add_by']) && !empty($_POST['user_add_by'])) {
                 $user_add_by = $_POST['user_add_by'];
             }
-            $user_unique_id = $BSPController->generateRandomString();
-            $user_unique_id = 'MH' . $user_unique_id;
-            $user_id = DB::table('users')->insertGetId([
+
+            DB::table('users')
+                ->where('user_unique_id', $_POST['user_reference_number'])
+                ->update([
                 'user_name' => $_POST['user_name'],
                 'user_mobile' => $_POST['user_mobile'],
                 'user_mobile_country_code' => '+91',
@@ -443,14 +609,15 @@ class UsersController extends Controller
                 'user_gender' => $user_gender,
                 'user_image' => $user_image,
                 'user_reference_number' => $user_reference_number,
-                'user_unique_id' => $user_unique_id,
                 'user_role_name' => 'User',
                 'user_status' => 'Inactive',
                 'user_add_date' => time(),
                 'user_add_by' => $user_add_by,
             ]);
-            $user_details_id = DB::table('user_details')->insertGetId([
-                'user_id' => $user_id,
+            $user_id = $User->get_user_id_by_reference_number($_POST['user_reference_number']);
+            DB::table('user_details')
+                ->where('user_id', $user_id)
+                ->update([
                 'user_bank_name' => $user_bank_name,
                 'user_bank_number' => $user_bank_number,
                 'user_IFSC_code' => $user_IFSC_code,
@@ -459,11 +626,7 @@ class UsersController extends Controller
                 'user_phone_pay_number' => $user_phone_pay_number,
                 'user_google_pay_number' => $user_google_pay_number,
                 'user_details_add_date' => time(),
-                'user_details_amount' => '',
-                'user_details_payment_date' => '',
-                'user_details_by' => '',
-                'user_details_image' => '',
-                'user_details_add_by' => $user_add_by,
+                'user_details_modify_by' => $user_id,
             ]);
             $BSPController->send_response_api(200, 'User added successfully please contact to admin', $user_id);
         } else {
@@ -517,18 +680,23 @@ class UsersController extends Controller
                 $get_help_count = $user->get_help_count($post->id);
                 $paid_help_count = $user->paid_help_count($post->id);
                 $status = "<a class='font-green-sharp' onclick='status_change({$post->id},&#39{$post->user_status}&#39);' title='Status' ><span>" . $post->user_status . "</span></a>";
+                if(isset($post->entry_fees) && !empty($post->entry_fees)){
+                    $fees_status = "<span class='badge badge-success'>Paid</span>";
+                }else{
+                    $fees_status = "<span class='badge badge-danger'>Pending</span>";
+                }
                 $show = route('user_view', $post->id);
                 $edit = route('user_edit', $post->id);
                 $get_help_button = '';
                 $paid_help_button = '';
-                if ($post->user_status == 'Active') {
-                    if ($get_help_count == 0) {
-                        $get_help_button = "<button class='btn btn-primary waves-effect waves-light model-getHelp' data-target='#modelGetHelp' data-toggle='modal' data-id='$post->id' data-help='Get'>Assign get Help</button>";
-                    }
-                    if ($paid_help_count < 3) {
-                        $paid_help_button = "<button class='btn btn-primary waves-effect waves-light model-paidHelp' data-target='#modelPaidHelp' data-toggle='modal' data-id='$post->id' data-help='Paid'>Assign Paid Help</button>";
-                    }
-                }
+//                if ($post->user_status == 'Active') {
+//                    if ($get_help_count == 0) {
+//                        $get_help_button = "<button class='btn btn-primary waves-effect waves-light model-getHelp' data-target='#modelGetHelp' data-toggle='modal' data-id='$post->id' data-help='Get'>Assign get Help</button>";
+//                    }
+//                    if ($paid_help_count < 3) {
+//                        $paid_help_button = "<button class='btn btn-primary waves-effect waves-light model-paidHelp' data-target='#modelPaidHelp' data-toggle='modal' data-id='$post->id' data-help='Paid'>Assign Paid Help</button>";
+//                    }
+//                }
                 $edit_view = "<a href='{$show}' title='View' ><i class='font-green-sharp fa fa-eye-slash'></i> </a>";
                 $nestedData['id'] = $post->id;
                 $nestedData['user_name'] = $post->user_name;
@@ -537,6 +705,7 @@ class UsersController extends Controller
                 $nestedData['user_city'] = $post->user_city;
                 $nestedData['user_reference_number'] = $post->user_reference_number;
                 $nestedData['user_status'] = "{$status}";
+                $nestedData['user_fees_status'] ="{$fees_status}";
                 $nestedData['action'] = "{$edit_view}
                                           &emsp;<a href='{$edit}' title='EDIT' ><i class='font-green-sharp fa fa-pencil-square-o'></i></a>&emsp;{$get_help_button} {$paid_help_button}";
                 $data[] = $nestedData;
@@ -570,12 +739,56 @@ class UsersController extends Controller
                 ->where('id', $id)
                 ->update(['user_status' => $status
                 ]);
+            $check_fees_status =DB::table('user_details')
+                ->where('user_id', $id)
+                ->value('user_details_amount');
+            if(isset($check_fees_status) && empty($check_fees_status) && $status =='Active'){
+                $site_settings = DB::table('site_setting')->orderBy('ss_id','desc')->get();
+                $user_data = DB::table('user_details')
+                    ->where('user_id', $id)
+                    ->update([
+                        'user_details_amount' => $site_settings[0]->ss_total_amount,
+                        'donation_fees' => $site_settings[0]->ss_donation,
+                        'entry_fees' => $site_settings[0]->ss_entry_fees,
+                        'discount' => $site_settings[0]->ss_discount,
+                        'discount_amount' => $site_settings[0]->ss_discount_amount,
+                        'user_details_payment_date' => time(),
+                    ]);
+                $user_unique_id_details =DB::table('users')
+                    ->select('user_unique_id','user_mobile')
+                    ->where('id', $id)
+                    ->get();
 
+                $user_details['user_unique_id'] = $user_unique_id_details[0]->user_unique_id;
+                $user_details['user_mobile'] =  $user_unique_id_details[0]->user_mobile;
+                $user_details['redirect_url'] = env('APP_URL').'user_create_success/'. $user_unique_id_details[0]->user_unique_id.'/'.$user_unique_id_details[0]->user_mobile;
+            }else{
+                $user_details['user_unique_id'] = '';
+                $user_details['user_mobile'] = '';
+                $user_details['redirect_url'] = '';
+            }
             if ($user_data) {
-                $BSPController->send_response_api(200, 'Status is ' . $status, '');
+                $BSPController->send_response_api(200, 'Status is ' . $status, $user_details);
             } else {
                 $BSPController->send_response_api(400, 'Status Can not be updated..', '');
             }
+        } else {
+            $BSPController->send_response_api(400, 'Invalid Request.', '');
+        }
+    }
+    public function send_sms_by_mobile()
+    {
+        $BSPController = new BSPController();
+        if (isset($_POST['u_id']) && !empty($_POST['u_id']) && isset($_POST['mobile']) && !empty($_POST['mobile'])) {
+            $u_id = $_POST['u_id'];
+            $password =DB::table('users')
+                ->where('user_unique_id', $u_id)
+                ->value('password');
+            $user_mobile = $_POST['mobile'];
+            $message = "Your password is $password. and username is $u_id";
+           // $BSPController->send_sms($user_mobile,$message);
+            $BSPController->send_response_api(200, 'Send sms to user mobile number','');
+
         } else {
             $BSPController->send_response_api(400, 'Invalid Request.', '');
         }
@@ -732,4 +945,5 @@ class UsersController extends Controller
             $BSPController->send_response_api(400, 'Invalid Request.', '');
         }
     }
+
 }

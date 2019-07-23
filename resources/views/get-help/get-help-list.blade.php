@@ -86,11 +86,11 @@
                 "columns": [
                     {"data": "id"},
                     {"data": "user_name"},
-                    {"data": "user_unique_id"},
                     {"data": "user_mobile"},
                     {"data": "user_city"},
-                    {"data": "user_reference_number"},
-                    {"data": "user_status"},
+                    {"data": "fee_status"},
+                    {"data": "get_help"},
+                    {"data": "status"},
                     {"data": "action"}
                 ]
 

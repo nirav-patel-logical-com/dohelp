@@ -12,7 +12,7 @@ class BSPController extends Controller
      * length of string is 6 character
      */
     function generateRandomString($length = 6) {
-        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $characters = '0123456789';
         $charactersLength = strlen($characters);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
@@ -20,7 +20,15 @@ class BSPController extends Controller
         }
         return $randomString;
     }
-
+    function generateRandomStringPassword($length = 6) {
+        $characters = '0123456789ABDCDEFGHIJKMNOPQRSTUV%#abcdefghijklmnopqrstuvwxyz';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
     /*
      * Function Create By : Vidhi
      * send response to the api

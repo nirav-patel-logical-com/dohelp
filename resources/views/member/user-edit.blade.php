@@ -65,6 +65,12 @@ $login_data = Session::get('login_data');
                                                     <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_phone"></li></ul>
                                                 </div>
                                             </div>
+                                            <div class="form-group row">
+                                                <div class="col-12">
+                                                    <input class="form-control" type="text" id="user_age" value="{{$user_data->user_age}}" placeholder="Age" onkeyup="BSP.only('digit','user_age')">
+                                                    <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_age"></li></ul>
+                                                </div>
+                                            </div>
                                             <input class="form-control" type="hidden" id="user_reference_number"  value="{{$user_data->user_reference_number}}">
 
                                             <div class="form-group row">
@@ -145,7 +151,7 @@ $login_data = Session::get('login_data');
 
                                             <div class="form-group text-center row m-t-10">
                                                 <div class="col-12">
-                                                    <button class="btn btn-success waves-effect waves-light" type="button" id="submitBtnJoinNow">Join Now
+                                                    <button class="btn btn-success waves-effect waves-light" type="button" id="submitBtnJoinNow">Submit
                                                     </button>
                                                     <button type="reset" class="btn btn-secondary waves-effect m-l-5" id="cancelBtnJoinNow">
                                                         Cancel
@@ -213,6 +219,7 @@ $login_data = Session::get('login_data');
                 var user_mobile = $("#user_mobile").val();
                 var user_name = $("#user_name").val();
                 var user_city = $("#user_city").val();
+                var user_age = $("#user_age").val();
                 var user_bank_name = $("#user_bank_name").val();
                 var user_bank_account_number = $("#user_bank_account_number").val();
                 var user_bank_IFAC_code = $("#user_bank_IFAC_code").val();
@@ -303,6 +310,7 @@ $login_data = Session::get('login_data');
                                             'user_name': user_name,
                                             'user_id': '<?php echo $user_data->id; ?>',
                                             'user_city': user_city,
+                                            'user_age': user_age,
                                             'user_reference_number': user_reference_number,
                                             'user_bank_name': user_bank_name,
                                             'user_bank_number': user_bank_account_number,
@@ -350,6 +358,7 @@ $login_data = Session::get('login_data');
                                 'user_name': user_name,
                                 'user_id': '<?php echo $user_data->id; ?>',
                                 'user_city': user_city,
+                                'user_age': user_age,
                                 'user_reference_number': user_reference_number,
                                 'user_bank_name': user_bank_name,
                                 'user_bank_number': user_bank_account_number,

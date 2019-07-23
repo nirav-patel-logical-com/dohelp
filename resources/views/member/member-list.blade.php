@@ -47,6 +47,7 @@ $login_data = Session::get('login_data');
                                     <th>City</th>
                                     <th>Reference Number</th>
                                     <th>Status</th>
+                                    <th>Fee Status</th>
                                     <th>Action</th>
                                 </tr>
                                 </thead>
@@ -145,6 +146,7 @@ $login_data = Session::get('login_data');
                     {"data": "user_city"},
                     {"data": "user_reference_number"},
                     {"data": "user_status"},
+                    {"data": "user_fees_status"},
                     {"data": "action"}
                 ]
 
@@ -171,7 +173,9 @@ $login_data = Session::get('login_data');
                             text: obj.MESSAGE,
                             timer: 1500
                         })
-                        window.location = '<?php echo route('memberList');?>';
+                        var user_unique_id = obj.DATA['user_unique_id'];
+                        var user_mobile = obj.DATA['user_mobile'];
+                        window.location =obj.DATA['redirect_url'] ;
                     } else {
                         Swal.fire({
                             type: 'error',

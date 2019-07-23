@@ -19,9 +19,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 //User Login API Route
 Route::post('login', 'APILoginController@login');
 Route::post('generateNewToken', 'APILoginController@generateNewToken');
-
+Route::post('forgotPassword', 'UsersController@forgotPasswordAPI')->name('forgotPassword');
 //User Create
-Route::post('user_create',['uses'=>'UsersController@userCreate']);
+Route::post('user_create',['uses'=>'UsersController@userCreateAPI']);
 
 //After Login check middleware' =>'jwt.auth'
 //Route::post('user_list',['middleware'=>['jwt.auth'],'uses'=>'UsersController@userList']);
@@ -36,6 +36,7 @@ Route::post('PaidHelpList','HelpController@PaidHelpList')->name('PaidHelpList');
 
 /*Web Route for API call*/
 Route::post('user_list_post','UsersController@user_list_post')->name('user_list_post');
+Route::post('dashboardAction','DashboardController@dashboardAction')->name('dashboardAction');
 Route::post('user_details_save','UsersController@user_details_save')->name('user_details_save');
 Route::post('user_details_update','UsersController@user_details_update')->name('user_details_update');
 Route::post('change_user_status','UsersController@change_user_status')->name('change_user_status');
@@ -43,4 +44,6 @@ Route::post('userEditAction','UsersController@userEdit')->name('userEditAction')
 Route::post('userCreateAction','UsersController@userCreate')->name('userCreateAction');
 Route::post('get_paid_user_list','UsersController@get_paid_user_list')->name('get_paid_user_list');
 Route::post('GetPaidAssignAction','HelpController@GetPaidAssignAction')->name('GetPaidAssignAction');
-
+Route::post('get_help_list_post','HelpController@get_help_list_post')->name('get_help_list_post');
+Route::post('userImageUpload','UsersController@userImageUpload')->name('userImageUpload');
+Route::post('send_sms_by_mobile','UsersController@send_sms_by_mobile')->name('send_sms_by_mobile');

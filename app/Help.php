@@ -45,7 +45,7 @@ class Help extends Authenticatable implements JWTSubject
                     'get_help.fess_id'
                     )
             ->leftJoin('users', 'get_help.assign_id', '=', 'users.id')
-            ->Where('id','<', $start)
+            ->Where('get_help.help_id','<', $start)
             ->limit($limit)
             ->get();
     }
@@ -68,42 +68,13 @@ class Help extends Authenticatable implements JWTSubject
                 'paid_help.fess_id'
             )
             ->leftJoin('users', 'paid_help.assign_id', '=', 'users.id')
-            ->Where('id','<', $start)
+            ->Where('paid_help.paid_id')
+            ->Where('paid_help.paid_id','<', $start)
             ->limit($limit)
             ->get();
     }
 
-    public function get_user_details_by_user_id($user_id)
-    {
-        return DB::table($this->table)
-            ->select('id',
-                'user_name',
-                'user_mobile_country_code',
-                'user_mobile',
-                'user_city',
-                'user_reference_number',
-                'user_status',
-                'user_gender',
-                'user_image',
-                'user_add_date',
-                'user_details_id',
-                'user_bank_name',
-                'user_bank_number',
-                'user_IFSC_code',
-                'user_bank_branch',
-                'user_phone_pay_number',
-                'user_paytm_number',
-                'user_google_pay_number',
-                'user_details_amount',
-                'user_details_payment_date',
-                'user_details_by',
-                'user_details_image'
-            )
-            ->leftJoin('user_details', 'users.id', '=', 'user_details.user_id')
-            ->Where('user_role_name','!=','Admin')
-            ->Where('id','=',$user_id)
-            ->get();
-    }
+    
 
     public function get_user_details_for_dashboard($user_id)
     {
@@ -121,6 +92,10 @@ class Help extends Authenticatable implements JWTSubject
             ->Where('user_role_name','!=','Admin')
             ->Where('id','=',$user_id)
             ->get();
+    }
+
+    public function get_help_list_post(){
+
     }
 
 }

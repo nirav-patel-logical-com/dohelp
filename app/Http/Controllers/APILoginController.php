@@ -16,16 +16,15 @@ class APILoginController extends Controller
     public function login()
     {
         $BSPController = new BSPController();
-        if (isset($_POST['user_mobile']) && !empty($_POST['user_mobile']) && isset($_POST['password']) && !empty($_POST['password'])) {
+        if (isset($_POST['user_unique_id']) && !empty($_POST['user_unique_id']) && isset($_POST['password']) && !empty($_POST['password'])) {
             $User = new User();
-            $mobile = $_POST['user_mobile'];
-            $mobile_country_code = $_POST['user_mobile_country_code'];
-            $login_data = $User->check_user_login($mobile, $mobile_country_code);
+            $user_unique_id = $_POST['user_unique_id'];
+            $login_data = $User->check_user_login($user_unique_id);
             //dd($login_data);
             if (isset($login_data) && !empty($login_data)) {
                 if (Hash::check($_POST['password'], $login_data[0]->password)) {
                     // get mobile and password from request
-                    $credentials = request(['user_mobile', 'password']);
+                    $credentials = request(['user_unique_id', 'password']);
                     unset($login_data[0]->password);
                     // try to auth and get the token using api authentication
                     if (!$token = auth('api')->attempt($credentials)) {

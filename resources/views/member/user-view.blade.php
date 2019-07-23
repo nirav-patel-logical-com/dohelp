@@ -51,7 +51,7 @@ $login_data = Session::get('login_data');
                                                 class="fa fa-phone"></i>&nbsp;{{$user_data->user_mobile}}</p>
 
                                     <p class="text-muted mb-1 font-13"><i
-                                                class="fa fa-map-marker"></i>&nbsp;{{$user_data->user_city   }}</p>
+                                                class="fa fa-map-marker"></i>&nbsp;{{$user_data->user_city}}</p>
                                 </div>
                             </div>
                         </div>
@@ -59,16 +59,7 @@ $login_data = Session::get('login_data');
                     <div class="col-md-6 col-xl-4">
                         <div class="card-box tilebox-one border-success border">
                             <i class="fa fa-info-circle float-right text-muted"></i>
-                            <h6 class="text-muted text-uppercase m-b-20">Get Help</h6>
-
-                            <h2 class="m-b-20"><i class="fa fa-rupee"></i> <span data-plugin="counterup">1,587</span>
-                            </h2>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-4">
-                        <div class="card-box tilebox-one border-success border">
-                            <i class="fa fa-info-circle float-right text-muted"></i>
-                            <h6 class="text-muted text-uppercase m-b-20">Get Help</h6>
+                            <h6 class="text-muted text-uppercase m-b-20">Earn Balance</h6>
 
                             <h2 class="m-b-20"><i class="fa fa-rupee"></i> <span data-plugin="counterup">1,587</span>
                             </h2>
@@ -93,11 +84,22 @@ $login_data = Session::get('login_data');
                                     <p class="text-muted mb-1 font-13"><strong>City :</strong>
                                         &nbsp;{{$user_data->user_city}}</p>
 
+                                    <p class="text-muted mb-1 font-13"><strong>Age :</strong>
+                                        &nbsp;{{$user_data->user_age}}</p>
+
+                                    <p class="text-muted mb-1 font-13"><strong>Unique Id :</strong>
+                                        &nbsp;{{$user_data->user_unique_id}}</p>
+
                                     <p class="text-muted mb-1 font-13"><strong>Reference Number : </strong>
                                         &nbsp;{{$user_data->user_reference_number}}</p>
 
                                     <p class="text-muted mb-1 font-13"><strong>Gender :</strong>
                                         &nbsp;{{$user_data->user_gender}}</p>
+                                    <p class="text-muted mb-1 font-13"><strong>Add date :</strong>
+                                        &nbsp;
+                                        <?php
+                                        echo  \Carbon\Carbon::createFromTimestamp($user_data->user_add_date,'Asia/Kolkata')->format('l, d M Y h:i A');
+                                        ?></p>
                                 </div>
                             </div>
                         </div>
@@ -143,19 +145,19 @@ $login_data = Session::get('login_data');
                     </div>
 
                 </div>
-                @if(isset($user_data->user_details_amount) && empty($user_data->user_details_amount))
-                <div class="row">
-                    <div class="col-md-12">
-                        <!-- Large modal -->
-                        @if($errors->any())
-                            <ul class="parsley-errors-list filled"><li class="parsley-required"><h4>{{$errors->first()}}</h4></li></ul>
-                        @endif
-                        <button class="btn btn-primary waves-effect waves-light" data-toggle="modal"
-                                data-target=".bs-example-modal-lg">Large modal
-                        </button>
-                    </div>
-                </div>
-                    @else
+                {{--@if(isset($user_data->user_details_amount) && empty($user_data->user_details_amount))--}}
+                {{--<div class="row">--}}
+                    {{--<div class="col-md-12">--}}
+                        {{--<!-- Large modal -->--}}
+                        {{--@if($errors->any())--}}
+                            {{--<ul class="parsley-errors-list filled"><li class="parsley-required"><h4>{{$errors->first()}}</h4></li></ul>--}}
+                        {{--@endif--}}
+                        {{--<button class="btn btn-primary waves-effect waves-light" data-toggle="modal"--}}
+                                {{--data-target=".bs-example-modal-lg">Large modal--}}
+                        {{--</button>--}}
+                    {{--</div>--}}
+                {{--</div>--}}
+                    {{--@else--}}
                     <div class="row">
                         <div class="col-md-6  col-xl-4">
                             <div class="card-box widget-user">
@@ -163,27 +165,40 @@ $login_data = Session::get('login_data');
                                     <div class="col-12 wid-u-info">
                                         <h5 class="m-t-1 m-b-5">FEES DETAILS</h5>
 
-                                        <p class="text-muted mb-1 font-13"><strong>Amount :</strong>
+                                        <p class="text-muted mb-1 font-13"><strong>Total Amount :</strong>
                                             &nbsp;{{$user_data->user_details_amount}}</p>
 
+                                        <p class="text-muted mb-1 font-13"><strong>Entry Fees :</strong>
+                                            &nbsp;{{$user_data->entry_fees}}</p>
+
+                                        <p class="text-muted mb-1 font-13"><strong>Donation Fees :</strong>
+                                            &nbsp;{{$user_data->donation_fees}}</p>
+
+                                        <p class="text-muted mb-1 font-13"><strong>company profit :</strong>
+                                            &nbsp;{{$user_data->discount}} &nbsp;%</p>
+
                                         <p class="text-muted mb-1 font-13"><strong>Payment Date : </strong>
-                                            &nbsp;{{$user_data->user_details_payment_date}}</p>
+                                            &nbsp;
+                                            <?php
+                                            echo  \Carbon\Carbon::createFromTimestamp($user_data->user_details_payment_date,'Asia/Kolkata')->format('l, d M Y h:i A');
+                                            ?>
+                                        </p>
 
-                                        <p class="text-muted mb-1 font-13"><strong>Description :</strong>
-                                            &nbsp;{{$user_data->user_details_by}}</p>
-                                        @if(isset($user_data->user_details_image_url) && !empty($user_data->user_details_image_url))
+                                        {{--<p class="text-muted mb-1 font-13"><strong>Description :</strong>--}}
+                                            {{--&nbsp;{{$user_data->user_details_by}}</p>--}}
+                                        {{--@if(isset($user_data->user_details_image_url) && !empty($user_data->user_details_image_url))--}}
 
-                                        <p class="text-muted mb-1 font-13"><img src="{{$user_data->user_details_image_url}}"
-                                                                                class="img-responsive rounded-circle"
-                                                                                alt="user"></p>
-                                        @endif
+                                        {{--<p class="text-muted mb-1 font-13"><img src="{{$user_data->user_details_image_url}}"--}}
+                                                                                {{--class="img-responsive rounded-circle"--}}
+                                                                                {{--alt="user"></p>--}}
+                                        {{--@endif--}}
 
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                @endif
+                {{--@endif--}}
             </div>
             <!-- container -->
             <!-- Modal -->

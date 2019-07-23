@@ -5,6 +5,7 @@
  * Date: 7/18/2019
  * Time: 11:47 AM
  */
+$login_data = Session::get('login_data');
 ?>
 @extends('includes.base')
 
@@ -65,7 +66,18 @@
                                                 </div>
                                             </div>
 
-                                            <input class="form-control" type="hidden" id="user_reference_number" >
+                                            <div class="form-group row">
+                                                <div class="col-12">
+                                                    <input class="form-control" type="text" name="user_age" id="user_age" placeholder="Age" onkeyup="BSP.only('digit','user_age')">
+                                                    <ul class="parsley-errors-list filled"><li class="parsley-required" id="label_user_age"></li></ul>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-12">
+                                                    <input class="form-control" type="text" id="user_reference_number" name="user_reference_number" placeholder="User Reference Number" >
+                                                </div>
+                                            </div>
 
 
                                             <div class="form-group row">
@@ -127,7 +139,7 @@
 
                                             <div class="form-group text-center row m-t-10">
                                                 <div class="col-12">
-                                                    <button class="btn btn-success waves-effect waves-light" type="button" id="submitBtnJoinNow">Join Now
+                                                    <button class="btn btn-success waves-effect waves-light" type="button" id="submitBtnJoinNow">Submit
                                                     </button>
                                                     <button type="reset" class="btn btn-secondary waves-effect m-l-5" id="cancelBtnJoinNow">
                                                         Cancel
@@ -180,6 +192,7 @@
                 var user_mobile = $("#user_mobile").val();
                 var user_name = $("#user_name").val();
                 var user_city = $("#user_city").val();
+                var user_age = $("#user_age").val();
                 var user_bank_name = $("#user_bank_name").val();
                 var user_bank_account_number = $("#user_bank_account_number").val();
                 var user_bank_IFAC_code = $("#user_bank_IFAC_code").val();
@@ -238,6 +251,18 @@
                     $("#user_city").removeClass('parsley-error');
                     $("#label_user_city").html("");
                 }
+                if (user_age == '') {
+                    $("#user_age").addClass('parsley-error');
+                    $("#label_user_age").html("Please Enter Your Age.");
+                    flag++;
+                    if (scroll_element == '') {
+                        scroll_element = 'user_age';
+                    }
+                }
+                else {
+                    $("#user_age").removeClass('parsley-error');
+                    $("#label_user_age").html("");
+                }
                 if(flag==0){
                     var user_image ='';
                         $.ajax({
@@ -247,6 +272,7 @@
                                 'user_mobile': user_mobile,
                                 'user_name': user_name,
                                 'user_city': user_city,
+                                'user_age': user_age,
                                 'user_reference_number': user_reference_number,
                                 'user_bank_name': user_bank_name,
                                 'user_bank_number': user_bank_account_number,
@@ -265,13 +291,10 @@
 
                                 var obj = jQuery.parseJSON(response)
                                 if (obj.STATUS_CODE == 200) {
-                                    Swal.fire({
-                                        type: 'success',
-                                        title: 'Success!',
-                                        text: obj.MESSAGE,
-                                        timer: 1500
-                                    })
-                                    window.location = '<?php echo route('memberList');?>';
+                                   var user_unique_id = obj.DATA['user_unique_id'];
+                                   var user_mobile = obj.DATA['user_mobile'];
+                                   var user_reference_number = obj.DATA['user_reference_number'];
+                                   window.location =obj.DATA['redirect_url'] ;
                                 } else {
                                     Swal.fire({
                                         type: 'error',

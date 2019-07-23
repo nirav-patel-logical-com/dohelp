@@ -54,12 +54,11 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function check_user_login($mobile,$mobile_country_code)
+    public function check_user_login($user_unique_id)
     {
         $collection = DB::table($this->table)
             ->Where('user_status', 'Active')
-            ->Where('user_mobile', $mobile)
-            ->Where('user_mobile_country_code', $mobile_country_code)
+            ->Where('user_unique_id', $user_unique_id)
             ->Where('user_role_name','!=','Admin')
             ->get();
 
@@ -84,6 +83,8 @@ class User extends Authenticatable implements JWTSubject
                     'user_mobile_country_code',
                     'user_mobile',
                     'user_city',
+                    'user_unique_id',
+                    'user_age',
                     'user_reference_number',
                     'user_status',
                     'user_gender',
@@ -99,15 +100,21 @@ class User extends Authenticatable implements JWTSubject
                     'user_google_pay_number',
                     'user_details_amount',
                     'user_details_payment_date',
+                    'donation_fees',
+                    'entry_fees',
+                    'discount',
+                    'discount_amount',
+                    'user_details_payment_date',
                     'user_details_image'
                     )
             ->leftJoin('user_details', 'users.id', '=', 'user_details.user_id')
             ->Where('id','<', $start)
-            ->limit($limit)
             ->Where('user_role_name','!=','Admin')
+            ->limit($limit)
             ->get();
     }
-    public function get_user_details_by_user_id($user_id)
+
+    public function get_user_list_for_dashboard($limit)
     {
         return DB::table($this->table)
             ->select('id',
@@ -115,6 +122,8 @@ class User extends Authenticatable implements JWTSubject
                 'user_mobile_country_code',
                 'user_mobile',
                 'user_city',
+                'user_unique_id',
+                'user_age',
                 'user_reference_number',
                 'user_status',
                 'user_gender',
@@ -130,6 +139,49 @@ class User extends Authenticatable implements JWTSubject
                 'user_google_pay_number',
                 'user_details_amount',
                 'user_details_payment_date',
+                'donation_fees',
+                'entry_fees',
+                'discount',
+                'discount_amount',
+                'user_details_payment_date',
+                'user_details_image'
+            )
+            ->leftJoin('user_details', 'users.id', '=', 'user_details.user_id')
+            ->Where('user_role_name','!=','Admin')
+            ->orderBy('id','DESC')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function get_user_details_by_user_id($user_id)
+    {
+        return DB::table($this->table)
+            ->select('id',
+                'user_name',
+                'user_mobile_country_code',
+                'user_mobile',
+                'user_unique_id',
+                'user_age',
+                'user_city',
+                'user_reference_number',
+                'user_status',
+                'user_gender',
+                'user_image',
+                'user_add_date',
+                'user_details_id',
+                'user_bank_name',
+                'user_bank_number',
+                'user_IFSC_code',
+                'user_bank_branch',
+                'user_phone_pay_number',
+                'user_paytm_number',
+                'user_google_pay_number',
+                'user_details_amount',
+                'donation_fees',
+                'entry_fees',
+                'discount',
+                'discount_amount',
+                'user_details_payment_date',
                 'user_details_by',
                 'user_details_image'
             )
@@ -144,6 +196,8 @@ class User extends Authenticatable implements JWTSubject
         return DB::table($this->table)
             ->select('id',
                 'user_name',
+                'user_unique_id',
+                'user_age',
                 'user_mobile_country_code',
                 'user_mobile',
                 'user_city',
@@ -156,6 +210,27 @@ class User extends Authenticatable implements JWTSubject
             ->Where('id','=',$user_id)
             ->get();
     }
+
+    public function get_user_details_for_admin_dashboard($user_id)
+    {
+        return DB::table($this->table)
+            ->select('id',
+                'user_name',
+                'user_unique_id',
+                'user_age',
+                'user_mobile_country_code',
+                'user_mobile',
+                'user_city',
+                'user_reference_number',
+                'user_gender',
+                'user_image',
+                'user_add_date'
+            )
+            ->Where('user_role_name','=','Admin')
+            ->Where('id','=',$user_id)
+            ->get();
+    }
+
     public function get_paid_user_list($user_id){
         $sql = "
          	SELECT
@@ -228,10 +303,12 @@ class User extends Authenticatable implements JWTSubject
                 `user_gender`,
                 `user_image`,
                 `user_city`,
+                `entry_fees`,
                 `user_reference_number`,
                 `user_status`,
                 `user_add_date`
          	FROM $this->table
+         	LEFT JOIN user_details ON users.id = user_details.user_id
          	WHERE 1
          	$con
          	$search_con
@@ -247,6 +324,18 @@ class User extends Authenticatable implements JWTSubject
             ->Where('user_reference_number', $user_reference_number)
             ->Where('user_role_name','!=','Admin')
             ->value('user_reference_number');
+    }
+    public function get_user_id_by_reference_number($user_reference_number){
+        return DB::table($this->table)
+            ->Where('user_unique_id', $user_reference_number)
+            ->Where('user_role_name','!=','Admin')
+            ->value('id');
+    }
+    public function check_unique_id_exist($user_unique_id){
+        return DB::table($this->table)
+            ->Where('user_unique_id', $user_unique_id)
+            ->Where('user_role_name','!=','Admin')
+            ->value('user_unique_id');
     }
     public function check_mobile_exist($user_mobile){
         return DB::table($this->table)
@@ -274,6 +363,11 @@ class User extends Authenticatable implements JWTSubject
         return DB::table($this->table)
             ->Where('user_mobile', $user_mobile)
             ->Where('user_role_name','=','Admin')
+            ->value('user_mobile');
+    }
+    public function check_user_is_unique_id($user_unique_id){
+        return DB::table($this->table)
+            ->Where('user_unique_id', $user_unique_id)
             ->value('user_mobile');
     }
 }
